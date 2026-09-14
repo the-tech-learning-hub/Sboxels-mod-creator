@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sandboxels Element Mod Creator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        pixelBg: '#121218',
+                        pixelCard: '#1a1a24',
+                        pixelBorder: '#2e2e40',
+                        pixelAccent: '#6366f1',
+                        pixelAccentHover: '#4f46e5',
+                        sbYellow: '#eab308',
+                        sbGreen: '#22c55e',
+                        sbRed: '#ef4444',
+                        sbCyan: '#06b6d4'
+                    },
+                    fontFamily: {
+                        pixel: ['"Press Start 2P"', 'monospace'],
+                        vt: ['VT323', 'monospace'],
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Pixel Art Scrollbars & Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #121218;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2e2e40;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4f46e5;
+        }
+        .pixel-corners {
+            clip-path: polygon(
+                0 4px, 4px 4px, 4px 0,
+                calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
+                100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
+                4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+            );
+        }
+        .pixel-border {
+            box-shadow: 0 0 0 2px #2e2e40;
+        }
+        .glow-accent {
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-pixelBg text-gray-100 font-sans min-h-screen flex flex-col selection:bg-pixelAccent selection:text-white">
+
+    <header class="border-b border-pixelBorder bg-pixelCard/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-gradient-to-br from-sbYellow via-sbGreen to-sbCyan rounded flex items-center justify-center font-pixel text-slate-900 font-bold text-lg shadow-lg">
+                    S
+                </div>
+                <div>
+                    <h1 class="font-pixel text-sm sm:text-base text-yellow-400 tracking-wide">SANDBOXELS MOD CREATOR</h1>
+                    <p class="text-xs text-gray-400 font-vt tracking-wider text-base">Eigene Elemente erstellen, testen & exportieren</p>
+                </div>
+            </div>
+
+            <!-- Quick Template Selector -->
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-gray-400 hidden md:inline"><i class="fa-solid fa-bolt text-yellow-400 mr-1"></i> Quick Templates:</span>
+                <select id="templateSelect" onchange="applyTemplate(this.value)" class="bg-pixelBg border border-pixelBorder text-xs text-gray-200 rounded px-3 py-1.5 focus:outline-none focus:border-pixelAccent transition cursor-pointer">
+                    <option value="">-- Template wählen --</option>
+                    <option value="solid">🗿 Standard Feststoff (Stein/Erz)</option>
+                    <option value="flammableLiquid">🔥 Brennbare Flüssigkeit (Öl/Benzin)</option>
+                    <option value="radioactiveGas">☢️ Radioaktives Gas (Uran-Dampf)</option>
+                    <option value="magma">🌋 Magma / Heiße Schmelze</option>
+                    <option value="acid">🧪 Korrosive Säure</option>
+                    <option value="explosive">💣 Explosives Pulver</option>
+                </select>
+                
+                <button onclick="resetForm()" class="bg-red-900/40 hover:bg-red-800/60 text-red-300 text-xs px-3 py-1.5 rounded border border-red-700/50 transition flex items-center gap-1" title="Formular zurücksetzen">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- LEFT COLUMN: Form Editor (7 Cols) -->
+        <div class="lg:col-span-7 flex flex-col gap-4">
+            
+            <!-- Navigation Tabs for Editor Sections -->
+            <div class="flex flex-wrap gap-2 border-b border-pixelBorder pb-2 text-xs font-semibold">
+                <button onclick="switchTab('basic')" id="tab-basic" class="tab-btn active bg-pixelAccent text-white px-3 py-2 rounded flex items-center gap-2 transition">
+                    <i class="fa-solid fa-cube"></i> Basis-Daten
+                </button>
+                <button onclick="switchTab('state')" id="tab-state" class="tab-btn bg-pixelCard text-gray-400 hover:text-white px-3 py-2 rounded flex items-center gap-2 transition">
+                    <i class="fa-solid fa-temperature-three-quarters"></i> Zustand & Hitze
+                </button>
+                <button onclick="switchTab('combustion')" id="tab-combustion" class="tab-btn bg-pixelCard text-gray-400 hover:text-white px-3 py-2 rounded flex items-center gap-2 transition">
+                    <i class="fa-solid fa-fire"></i> Brand & Explosion
+                </button>
+                <button onclick="switchTab('emission')" id="tab-emission" class="tab-btn bg-pixelCard text-gray-400 hover:text-white px-3 py-2 rounded flex items-center gap-2 transition">
+                    <i class="fa-solid fa-radiation"></i> Emission & Strahlung
+                </button>
+                <button onclick="switchTab('reactions')" id="tab-reactions" class="tab-btn bg-pixelCard text-gray-400 hover:text-white px-3 py-2 rounded flex items-center gap-2 transition">
+                    <i class="fa-solid fa-flask"></i> Reaktionen
+                </button>
+                <button onclick="switchTab('advanced')" id="tab-advanced" class="tab-btn bg-pixelCard text-gray-400 hover:text-white px-3 py-2 rounded flex items-center gap-2 transition">
+                    <i class="fa-solid fa-code"></i> Extra / Code
+                </button>
+            </div>
+
+            <!-- TAB CONTENTS -->
+            <div id="editorForm" class="bg-pixelCard border border-pixelBorder rounded-xl p-5 shadow-xl flex-1 flex flex-col gap-5">
+                
+                <!-- 1. BASIC PROPERTIES -->
+                <div id="section-basic" class="tab-content space-y-4">
+                    <h3 class="font-pixel text-xs text-pixelAccent uppercase tracking-wide border-b border-pixelBorder pb-2">
+                        <i class="fa-solid fa-tag mr-2"></i> Basis Information
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Element Name <span class="text-red-400">*</span></label>
+                            <input type="text" id="propName" value="Super Plasma" oninput="updateAll()" placeholder="z.B. Super Plasma" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
+                            <p class="text-[10px] text-gray-500 mt-1">Anzeigename im Spiel.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">ID / Key <span class="text-red-400">*</span></label>
+                            <input type="text" id="propId" value="super_plasma" oninput="updateAll()" placeholder="z.B. super_plasma" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none font-mono">
+                            <p class="text-[10px] text-gray-500 mt-1">Eindeutige ID (Kleinbuchstaben & Unterstriche).</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Kategorie</label>
+                            <select id="propCategory" onchange="updateAll()" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
+                                <option value="powders">Powders (Pulver / Sand)</option>
+                                <option value="land">Land (Boden / Gestein)</option>
+                                <option value="liquids">Liquids (Flüssigkeiten)</option>
+                                <option value="gases">Gases (Gase / Dämpfe)</option>
+                                <option value="energy">Energy (Energie / Plasma)</option>
+                                <option value="life">Life (Organisch / Biologie)</option>
+                                <option value="weapons">Weapons (Waffen / Bomben)</option>
+                                <option value="special">Special (Spezial / Custom)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Farbe (Color)</label>
+                            <div class="flex gap-2">
+                                <input type="color" id="propColor" value="#9333ea" onchange="syncColorInput(this.value)" class="h-9 w-12 bg-pixelBg border border-pixelBorder rounded cursor-pointer p-0.5">
+                                <input type="text" id="propColorText" value="#9333ea" oninput="syncColorPicker(this.value)" class="flex-1 bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white font-mono focus:border-pixelAccent focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Beschreibung / Text</label>
+                        <textarea id="propDesc" oninput="updateAll()" rows="2" placeholder="Kurze Beschreibung des Elements..." class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">Ein hochenenergetisches Element, das intensive Strahlung emittiert.</textarea>
+                    </div>
+                </div>
+
+                <!-- 2. STATE & PHYSICAL PROPERTIES -->
+                <div id="section-state" class="tab-content hidden space-y-4">
+                    <h3 class="font-pixel text-xs text-pixelAccent uppercase tracking-wide border-b border-pixelBorder pb-2">
+                        <i class="fa-solid fa-atom mr-2"></i> Physik, Zustand & Temperatur
+                    </h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Aggregatzustand (State)</label>
+                            <select id="propState" onchange="updateAll()" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
+                                <option value="solid">Solid (Feststoff)</option>
+                                <option value="liquid">Liquid (Flüssigkeit)</option>
+                                <option value="gas">Gas (Gasförmig)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Dichte (Density)</label>
+                            <input type="number" id="propDensity" value="1000" oninput="updateAll()" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
+                            <p class="text-[10px] text-gray-500 mt-1">Schwere im Vergleich zu Wasser (1000).</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Viskosität (Viscosity)</label>
+                            <input type="number" id="propViscosity" value="1" oninput="updateAll()" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
+                            <p class="text-[10px] text-gray-500 mt-1">Fließgeschwindigkeit (nur Liquid).</p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-pixelBg/50 border border-pixelBorder rounded-lg space-y-3">
+                        <span class="text-xs font-semibold text-yellow-400 block"><i class="fa-solid fa-temperature-high mr-1"></i> Schmelzen / Verdampfen (High Temp)</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Schmelztemp (°C) [highTemp]</label>
+                                <input type="number" id="propHighTemp" value="1500" oninput="updateAll()" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Wird zu Element [stateHigh]</label>
+                                <input type="text" id="propStateHigh" value="magma" oninput="updateAll()" placeholder="z.B. magma oder fire" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none font-mono">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-pixelBg/50 border border-pixelBorder rounded-lg space-y-3">
+                        <span class="text-xs font-semibold text-cyan-400 block"><i class="fa-solid fa-snowflake mr-1"></i> Gefrieren / Kondensieren (Low Temp)</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Gefriertemp (°C) [lowTemp]</label>
+                                <input type="number" id="propLowTemp" value="" oninput="updateAll()" placeholder="z.B. 0" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Wird zu Element [stateLow]</label>
+                                <input type="text" id="propStateLow" value="" oninput="updateAll()" placeholder="z.B. ice" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none font-mono">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. COMBUSTION & EXPLOSION -->
+                <div id="section-combustion" class="tab-content hidden space-y-4">
+                    <h3 class="font-pixel text-xs text-pixelAccent uppercase tracking-wide border-b border-pixelBorder pb-2">
+                        <i class="fa-solid fa-fire-flame-curved mr-2"></i> Brennbarkeit & Explosivität
+                    </h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Brennbar (Burn % Chance)</label>
+                            <input type="number" id="propBurn" value="0" min="0" max="100" oninput="updateAll()" placeholder="0 - 100" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
+                            <p class="text-[10px] text-gray-500 mt-1">Chance pro Tick zu brennen.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Brenndauer (Burn Ticks)</label>
+                            <input type="number" id="propBurnTime" value="100" oninput="updateAll()" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Entzündungstemp (°C)</label>
+                            <input type="number" id="propBurnTemp" value="400" oninput="updateAll()" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Brennt zu (burnInto)</label>
+                            <input type="text" id="propBurnInto" value="ash" oninput="updateAll()" placeholder="z.B. ash, fire, smoke" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Explosions-Typ (explosionType)</label>
+                            <select id="propExplosionType" onchange="updateAll()" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
+                                <option value="">Keine Explosion</option>
+                                <option value="1">Kleine Explosion (1)</option>
+                                <option value="2">Mittlere Explosion (2)</option>
+                                <option value="3">Große Explosion (3)</option>
+                                <option value="nuke">Atomar / Nuke</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. EMISSION & RADIOACTIVITY -->
+                <div id="section-emission" class="tab-content hidden space-y-4">
+                    <h3 class="font-pixel text-xs text-pixelAccent uppercase tracking-wide border-b border-pixelBorder pb-2">
+                        <i class="fa-solid fa-wifi mr-2"></i> Emission / Radioaktivität
+                    </h3>
+
+                    <p class="text-xs text-gray-400">
+                        Lässt das Element kontinuierlich andere Partikel/Strahlung abgeben (z.B. Radioaktivität, Licht, Funken oder Gase).
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Emittiertes Element [emit]</label>
+                            <input type="text" id="propEmit" value="radiation" oninput="updateAll()" placeholder="z.B. radiation, light, fire" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Emissions-Chance % [emitChance]</label>
+                            <input type="number" id="propEmitChance" value="15" min="0" max="100" oninput="updateAll()" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Anzahl Partikel [emitNum]</label>
+                            <input type="number" id="propEmitNum" value="1" min="1" max="10" oninput="updateAll()" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. REACTIONS -->
+                <div id="section-reactions" class="tab-content hidden space-y-4">
+                    <h3 class="font-pixel text-xs text-pixelAccent uppercase tracking-wide border-b border-pixelBorder pb-2">
+                        <i class="fa-solid fa-vial-circle-check mr-2"></i> Chemische Reaktionen
+                    </h3>
+                    <p class="text-xs text-gray-400">
+                        Definiere, was passiert, wenn dieses Element ein anderes Element berührt.
+                    </p>
+
+                    <div id="reactionsList" class="space-y-3">
+                        <!-- Dynamic Reactions added here -->
+                    </div>
+
+                    <button onclick="addReactionRow()" class="bg-pixelBorder hover:bg-pixelAccent text-white text-xs px-3 py-2 rounded transition flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Reaktion hinzufügen
+                    </button>
+                </div>
+
+                <!-- 6. ADVANCED & CUSTOM CODE -->
+                <div id="section-advanced" class="tab-content hidden space-y-4">
+                    <h3 class="font-pixel text-xs text-pixelAccent uppercase tracking-wide border-b border-pixelBorder pb-2">
+                        <i class="fa-solid fa-sliders mr-2"></i> Erweiterte Attribute & Custom Tick
+                    </h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Härte (Hardness 0-1)</label>
+                            <input type="number" step="0.1" id="propHardness" value="0.5" oninput="updateAll()" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Elektr. Leitfähig (Conduct)</label>
+                            <input type="number" step="0.1" id="propConduct" value="0" oninput="updateAll()" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Färbend (Stain %)</label>
+                            <input type="number" id="propStain" value="0" oninput="updateAll()" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-2">
+                        <input type="checkbox" id="propHidden" onchange="updateAll()" class="w-4 h-4 rounded bg-pixelBg border-pixelBorder text-pixelAccent focus:ring-0 cursor-pointer">
+                        <label for="propHidden" class="text-xs text-gray-300 cursor-pointer">Verstecktes Element in der Menüleiste (hidden: true)</label>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Custom Tick Function (JS Logic)</label>
+                        <textarea id="propTickCode" oninput="updateAll()" rows="3" placeholder="// z.B. pixel.temp += 1;" class="w-full bg-pixelBg border border-pixelBorder rounded px-3 py-2 text-xs font-mono text-emerald-400 focus:border-pixelAccent focus:outline-none">pixel.temp += 0.1;</textarea>
+                        <p class="text-[10px] text-gray-500 mt-1">Wird jeden Frame für jedes Partikel ausgeführt. Variablen: `pixel`, `x`, `y`.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Simulator Preview & Code Output (5 Cols) -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            
+            <!-- SIMULATOR CANVAS PREVIEW -->
+            <div class="bg-pixelCard border border-pixelBorder rounded-xl p-4 shadow-xl flex flex-col gap-3">
+                <div class="flex justify-between items-center border-b border-pixelBorder pb-2">
+                    <h3 class="font-pixel text-xs text-yellow-400 flex items-center gap-2">
+                        <i class="fa-solid fa-gamepad"></i> LIVE SANDBOX SIMULATOR
+                    </h3>
+                    <span class="text-[10px] bg-pixelBg text-emerald-400 px-2 py-0.5 rounded font-mono border border-emerald-500/30">60 FPS</span>
+                </div>
+
+                <!-- Canvas Component -->
+                <div class="relative bg-black rounded-lg overflow-hidden border border-pixelBorder aspect-square w-full flex items-center justify-center">
+                    <canvas id="simCanvas" width="128" height="128" class="w-full h-full image-rendering-pixelated cursor-crosshair"></canvas>
+                    
+                    <!-- Overlay Tooltip for Mouse Position -->
+                    <div id="simInfo" class="absolute bottom-2 left-2 bg-pixelBg/80 backdrop-blur text-[10px] font-mono px-2 py-1 rounded text-gray-300 border border-pixelBorder pointer-events-none">
+                        Tool: Placing
+                    </div>
+                </div>
+
+                <!-- Controls for Simulator -->
+                <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div class="flex gap-1">
+                        <button onclick="setSimTool('element')" id="tool-element" class="sim-tool-btn active bg-pixelAccent text-white px-2.5 py-1 rounded text-xs">
+                            <i class="fa-solid fa-pencil"></i> Element
+                        </button>
+                        <button onclick="setSimTool('wall')" id="tool-wall" class="sim-tool-btn bg-pixelBg hover:bg-pixelBorder text-gray-300 px-2.5 py-1 rounded text-xs">
+                            🧱 Wand
+                        </button>
+                        <button onclick="setSimTool('eraser')" id="tool-eraser" class="sim-tool-btn bg-pixelBg hover:bg-pixelBorder text-gray-300 px-2.5 py-1 rounded text-xs">
+                            🧹 Radierer
+                        </button>
+                        <button onclick="setSimTool('heat')" id="tool-heat" class="sim-tool-btn bg-pixelBg hover:bg-pixelBorder text-gray-300 px-2.5 py-1 rounded text-xs">
+                            🔥 Hitze
+                        </button>
+                    </div>
+
+                    <button onclick="clearSimCanvas()" class="bg-red-900/40 hover:bg-red-800/60 text-red-300 px-2.5 py-1 rounded border border-red-700/40 text-xs">
+                        <i class="fa-solid fa-trash"></i> Leeren
+                    </button>
+                </div>
+            </div>
+
+            <!-- EXPORT & CODE PREVIEW -->
+            <div class="bg-pixelCard border border-pixelBorder rounded-xl p-4 shadow-xl flex-1 flex flex-col gap-3">
+                <div class="flex justify-between items-center border-b border-pixelBorder pb-2">
+                    <h3 class="font-pixel text-xs text-sbCyan flex items-center gap-2">
+                        <i class="fa-solid fa-code"></i> MOD CODE EXPORT
+                    </h3>
+                    <div class="flex gap-2">
+                        <button onclick="copyCode()" class="bg-pixelBorder hover:bg-pixelAccent text-white text-xs px-2.5 py-1 rounded transition flex items-center gap-1">
+                            <i class="fa-solid fa-copy"></i> Kopieren
+                        </button>
+                        <button onclick="downloadCode()" class="bg-pixelAccent hover:bg-pixelAccentHover text-white text-xs px-2.5 py-1 rounded transition flex items-center gap-1 font-semibold">
+                            <i class="fa-solid fa-download"></i> .JS Download
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Code Container -->
+                <pre class="bg-pixelBg border border-pixelBorder rounded-lg p-3 text-xs font-mono text-emerald-400 overflow-x-auto max-h-64 flex-1 select-all" id="codeOutput"></pre>
+
+                <!-- Instructions Accordion -->
+                <details class="bg-pixelBg/40 border border-pixelBorder rounded p-2 text-xs text-gray-300">
+                    <summary class="cursor-pointer font-semibold text-yellow-400 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-info"></i> Wie lade ich den Mod in Sandboxels?
+                    </summary>
+                    <ol class="list-decimal list-inside space-y-1 mt-2 text-gray-400 pl-1">
+                        <li>Öffne <a href="https://sandboxels.org" target="_blank" class="text-pixelAccent underline">Sandboxels</a> im Browser.</li>
+                        <li>Drücke <kbd class="bg-pixelBg px-1 rounded border border-pixelBorder text-gray-200">F12</kbd> um die Entwickler-Konsole zu öffnen.</li>
+                        <li>Füge den generierten Code direkt in die Konsole ein und drücke <kbd class="bg-pixelBg px-1 rounded border border-pixelBorder text-gray-200">Enter</kbd>.</li>
+                        <li><strong>Alternative:</strong> Speichere die `.js` Datei und lade sie im Mod-Manager von Sandboxels hoch!</li>
+                    </ol>
+                </details>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        // GLOBAL STATE
+        let reactionsList = [
+            { target: 'water', result: 'steam' }
+        ];
+
+        let currentSimTool = 'element'; // 'element', 'wall', 'eraser', 'heat'
+
+        // TEMPLATES DEFINITION
+        const templates = {
+            solid: {
+                name: "Obsidian Erz",
+                id: "obsidian_ore",
+                category: "land",
+                color: "#3b2d54",
+                desc: "Ein hartes, resistentes Gestein.",
+                state: "solid",
+                density: 2500,
+                viscosity: 1,
+                highTemp: 1200,
+                stateHigh: "magma",
+                lowTemp: "",
+                stateLow: "",
+                burn: 0,
+                burnTime: 0,
+                burnTemp: 0,
+                burnInto: "ash",
+                explosionType: "",
+                emit: "",
+                emitChance: 0,
+                emitNum: 1,
+                hardness: 0.9,
+                conduct: 0.1,
+                stain: 0,
+                hidden: false,
+                tickCode: "",
+                reactions: []
+            },
+            flammableLiquid: {
+                name: "Nitro Treibstoff",
+                id: "nitro_fuel",
+                category: "liquids",
+                color: "#e11d48",
+                desc: "Hocheffektiver, leicht entzündlicher Treibstoff.",
+                state: "liquid",
+                density: 800,
+                viscosity: 0.5,
+                highTemp: 150,
+                stateHigh: "fire",
+                lowTemp: -30,
+                stateLow: "frozen_fuel",
+                burn: 80,
+                burnTime: 120,
+                burnTemp: 50,
+                burnInto: "fire",
+                explosionType: "2",
+                emit: "smoke",
+                emitChance: 5,
+                emitNum: 1,
+                hardness: 0,
+                conduct: 0,
+                stain: 20,
+                hidden: false,
+                tickCode: "",
+                reactions: [{ target: 'fire', result: 'explosion' }]
+            },
+            radioactiveGas: {
+                name: "Uran Dampf",
+                id: "uranium_gas",
+                category: "gases",
+                color: "#22c55e",
+                desc: "Giftiger und radioaktiver grüner Dampf.",
+                state: "gas",
+                density: -10,
+                viscosity: 1,
+                highTemp: 3000,
+                stateHigh: "plasma",
+                lowTemp: 100,
+                stateLow: "uranium_dust",
+                burn: 0,
+                burnTime: 0,
+                burnTemp: 0,
+                burnInto: "ash",
+                explosionType: "",
+                emit: "radiation",
+                emitChance: 30,
+                emitNum: 2,
+                hardness: 0,
+                conduct: 0.8,
+                stain: 40,
+                hidden: false,
+                tickCode: "pixel.temp += 0.5;",
+                reactions: [{ target: 'water', result: 'dirty_water' }]
+            },
+            magma: {
+                name: "Super Lava",
+                id: "super_lava",
+                category: "liquids",
+                color: "#f97316",
+                desc: "Extrem heiße geschmolzene Masse.",
+                state: "liquid",
+                density: 3000,
+                viscosity: 15,
+                highTemp: 4000,
+                stateHigh: "plasma",
+                lowTemp: 800,
+                stateLow: "basalt",
+                burn: 100,
+                burnTime: 200,
+                burnTemp: 100,
+                burnInto: "fire",
+                explosionType: "",
+                emit: "fire",
+                emitChance: 10,
+                emitNum: 1,
+                hardness: 0.2,
+                conduct: 0.5,
+                stain: 0,
+                hidden: false,
+                tickCode: "pixel.temp = Math.max(pixel.temp, 1200);",
+                reactions: [{ target: 'water', result: 'basalt' }]
+            },
+            acid: {
+                name: "Xeno Säure",
+                id: "xeno_acid",
+                category: "liquids",
+                color: "#a3e635",
+                desc: "Zersetzt fast alle bekannten Materialien.",
+                state: "liquid",
+                density: 1200,
+                viscosity: 2,
+                highTemp: 400,
+                stateHigh: "toxic_gas",
+                lowTemp: -10,
+                stateLow: "acid_ice",
+                burn: 0,
+                burnTime: 0,
+                burnTemp: 0,
+                burnInto: "ash",
+                explosionType: "",
+                emit: "toxic_gas",
+                emitChance: 5,
+                emitNum: 1,
+                hardness: 0,
+                conduct: 0.9,
+                stain: 50,
+                hidden: false,
+                tickCode: "",
+                reactions: [{ target: 'stone', result: 'toxic_gas' }, { target: 'plant', result: 'sludge' }]
+            },
+            explosive: {
+                name: "C4 Pulver",
+                id: "c4_powder",
+                category: "powders",
+                color: "#f43f5e",
+                desc: "Hochexplosives Pulver.",
+                state: "solid",
+                density: 1500,
+                viscosity: 1,
+                highTemp: 200,
+                stateHigh: "fire",
+                lowTemp: "",
+                stateLow: "",
+                burn: 100,
+                burnTime: 10,
+                burnTemp: 100,
+                burnInto: "explosion",
+                explosionType: "nuke",
+                emit: "",
+                emitChance: 0,
+                emitNum: 1,
+                hardness: 0.1,
+                conduct: 0.2,
+                stain: 0,
+                hidden: false,
+                tickCode: "",
+                reactions: [{ target: 'fire', result: 'explosion' }]
+            }
+        };
+
+        // UI TABS SWITCHER
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-pixelAccent', 'text-white');
+                btn.classList.add('bg-pixelCard', 'text-gray-400');
+            });
+
+            document.getElementById('section-' + tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('tab-' + tabId);
+            activeBtn.classList.add('active', 'bg-pixelAccent', 'text-white');
+            activeBtn.classList.remove('bg-pixelCard', 'text-gray-400');
+        }
+
+        // COLOR SYNCING
+        function syncColorInput(val) {
+            document.getElementById('propColorText').value = val;
+            updateAll();
+        }
+        function syncColorPicker(val) {
+            if (/^#[0-9A-F]{6}$/i.test(val)) {
+                document.getElementById('propColor').value = val;
+            }
+            updateAll();
+        }
+
+        // REACTION ROW MANAGEMENT
+        function renderReactions() {
+            const container = document.getElementById('reactionsList');
+            container.innerHTML = '';
+
+            reactionsList.forEach((r, idx) => {
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-2 bg-pixelBg/60 p-2 rounded border border-pixelBorder";
+                div.innerHTML = `
+                    <span class="text-xs text-gray-400">Trifft</span>
+                    <input type="text" value="${r.target}" oninput="reactionsList[${idx}].target = this.value; updateAll();" placeholder="z.B. water" class="flex-1 bg-pixelBg border border-pixelBorder rounded px-2 py-1 text-xs text-white font-mono focus:border-pixelAccent focus:outline-none">
+                    <span class="text-xs text-gray-400">➜ wird zu</span>
+                    <input type="text" value="${r.result}" oninput="reactionsList[${idx}].result = this.value; updateAll();" placeholder="z.B. steam" class="flex-1 bg-pixelBg border border-pixelBorder rounded px-2 py-1 text-xs text-white font-mono focus:border-pixelAccent focus:outline-none">
+                    <button onclick="removeReactionRow(${idx})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-xmark"></i></button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addReactionRow() {
+            reactionsList.push({ target: '', result: '' });
+            renderReactions();
+            updateAll();
+        }
+
+        function removeReactionRow(idx) {
+            reactionsList.splice(idx, 1);
+            renderReactions();
+            updateAll();
+        }
+
+        // APPLY TEMPLATE
+        function applyTemplate(type) {
+            if (!type || !templates[type]) return;
+            const t = templates[type];
+
+            document.getElementById('propName').value = t.name;
+            document.getElementById('propId').value = t.id;
+            document.getElementById('propCategory').value = t.category;
+            document.getElementById('propColor').value = t.color;
+            document.getElementById('propColorText').value = t.color;
+            document.getElementById('propDesc').value = t.desc;
+
+            document.getElementById('propState').value = t.state;
+            document.getElementById('propDensity').value = t.density;
+            document.getElementById('propViscosity').value = t.viscosity;
+            document.getElementById('propHighTemp').value = t.highTemp;
+            document.getElementById('propStateHigh').value = t.stateHigh;
+            document.getElementById('propLowTemp').value = t.lowTemp;
+            document.getElementById('propStateLow').value = t.stateLow;
+
+            document.getElementById('propBurn').value = t.burn;
+            document.getElementById('propBurnTime').value = t.burnTime;
+            document.getElementById('propBurnTemp').value = t.burnTemp;
+            document.getElementById('propBurnInto').value = t.burnInto;
+            document.getElementById('propExplosionType').value = t.explosionType;
+
+            document.getElementById('propEmit').value = t.emit;
+            document.getElementById('propEmitChance').value = t.emitChance;
+            document.getElementById('propEmitNum').value = t.emitNum;
+
+            document.getElementById('propHardness').value = t.hardness;
+            document.getElementById('propConduct').value = t.conduct;
+            document.getElementById('propStain').value = t.stain;
+            document.getElementById('propHidden').checked = t.hidden;
+            document.getElementById('propTickCode').value = t.tickCode;
+
+            reactionsList = JSON.parse(JSON.stringify(t.reactions));
+            renderReactions();
+
+            updateAll();
+        }
+
+        function resetForm() {
+            document.getElementById('templateSelect').value = '';
+            applyTemplate('solid');
+        }
+
+        // GENERATE CODE OBJECT
+        function generateElementData() {
+            const id = (document.getElementById('propId').value || 'custom_element').toLowerCase().replace(/\s+/g, '_');
+            const name = document.getElementById('propName').value || 'Custom Element';
+            const color = document.getElementById('propColorText').value || '#ffffff';
+            const category = document.getElementById('propCategory').value;
+            const desc = document.getElementById('propDesc').value;
+
+            const state = document.getElementById('propState').value;
+            const density = parseFloat(document.getElementById('propDensity').value) || 1000;
+            const viscosity = parseFloat(document.getElementById('propViscosity').value) || 1;
+
+            const highTemp = document.getElementById('propHighTemp').value;
+            const stateHigh = document.getElementById('propStateHigh').value;
+            const lowTemp = document.getElementById('propLowTemp').value;
+            const stateLow = document.getElementById('propStateLow').value;
+
+            const burn = parseFloat(document.getElementById('propBurn').value) || 0;
+            const burnTime = parseFloat(document.getElementById('propBurnTime').value) || 0;
+            const burnTemp = parseFloat(document.getElementById('propBurnTemp').value) || 0;
+            const burnInto = document.getElementById('propBurnInto').value;
+            const explosionType = document.getElementById('propExplosionType').value;
+
+            const emit = document.getElementById('propEmit').value;
+            const emitChance = parseFloat(document.getElementById('propEmitChance').value) || 0;
+            const emitNum = parseInt(document.getElementById('propEmitNum').value) || 1;
+
+            const hardness = parseFloat(document.getElementById('propHardness').value) || 0;
+            const conduct = parseFloat(document.getElementById('propConduct').value) || 0;
+            const stain = parseFloat(document.getElementById('propStain').value) || 0;
+            const hidden = document.getElementById('propHidden').checked;
+            const tickCode = document.getElementById('propTickCode').value.trim();
+
+            const data = {
+                id, name, color, category, desc, state, density, viscosity,
+                highTemp, stateHigh, lowTemp, stateLow,
+                burn, burnTime, burnTemp, burnInto, explosionType,
+                emit, emitChance, emitNum, hardness, conduct, stain, hidden, tickCode
+            };
+
+            return data;
+        }
+
+        // UPDATE EVERYTHING (CODE OUTPUT & SIMULATOR DATA)
+        function updateAll() {
+            const data = generateElementData();
+
+            // Build JS Code
+            let js = `// Custom Sandboxels Mod: ${data.name}\n`;
+            js += `// ID: ${data.id}\n\n`;
+            js += `elements["${data.id}"] = {\n`;
+            js += `    color: "${data.color}",\n`;
+            js += `    category: "${data.category}",\n`;
+            js += `    state: "${data.state}",\n`;
+            js += `    density: ${data.density},\n`;
+
+            if (data.desc) js += `    desc: "${data.desc.replace(/"/g, '\\"')}",\n`;
+            if (data.state === 'liquid') js += `    viscosity: ${data.viscosity},\n`;
+
+            if (data.highTemp !== "") js += `    highTemp: ${data.highTemp},\n`;
+            if (data.stateHigh !== "") js += `    stateHigh: "${data.stateHigh}",\n`;
+            if (data.lowTemp !== "") js += `    lowTemp: ${data.lowTemp},\n`;
+            if (data.stateLow !== "") js += `    stateLow: "${data.stateLow}",\n`;
+
+            if (data.burn > 0) {
+                js += `    burn: ${data.burn},\n`;
+                js += `    burnTime: ${data.burnTime},\n`;
+                js += `    burnTemp: ${data.burnTemp},\n`;
+                if (data.burnInto) js += `    burnInto: "${data.burnInto}",\n`;
+            }
+
+            if (data.explosionType) {
+                if (!isNaN(data.explosionType)) {
+                    js += `    explosionType: ${data.explosionType},\n`;
+                } else {
+                    js += `    explosionType: "${data.explosionType}",\n`;
+                }
+            }
+
+            if (data.emit) {
+                js += `    emit: "${data.emit}",\n`;
+                js += `    emitChance: ${data.emitChance},\n`;
+                js += `    emitNum: ${data.emitNum},\n`;
+            }
+
+            if (data.hardness > 0) js += `    hardness: ${data.hardness},\n`;
+            if (data.conduct > 0) js += `    conduct: ${data.conduct},\n`;
+            if (data.stain > 0) js += `    stain: ${data.stain},\n`;
+            if (data.hidden) js += `    hidden: true,\n`;
+
+            // Reactions
+            const validReactions = reactionsList.filter(r => r.target.trim() && r.result.trim());
+            if (validReactions.length > 0) {
+                js += `    reactions: {\n`;
+                validReactions.forEach(r => {
+                    js += `        "${r.target.trim()}": { elem2: "${r.result.trim()}" },\n`;
+                });
+                js += `    },\n`;
+            }
+
+            // Custom Tick Function
+            if (data.tickCode) {
+                js += `    tick: function(pixel) {\n`;
+                js += `        ${data.tickCode.replace(/\n/g, '\n        ')}\n`;
+                js += `    }\n`;
+            }
+
+            js += `};\n`;
+
+            document.getElementById('codeOutput').textContent = js;
+        }
+
+        // COPY & DOWNLOAD
+        function copyCode() {
+            const code = document.getElementById('codeOutput').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code in die Zwischenablage kopiert!');
+            }).catch(() => {
+                // Fallback for clipboard
+                const textarea = document.createElement('textarea');
+                textarea.value = code;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('Code in die Zwischenablage kopiert!');
+            });
+        }
+
+        function downloadCode() {
+            const code = document.getElementById('codeOutput').textContent;
+            const data = generateElementData();
+            const blob = new Blob([code], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${data.id}_mod.js`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // =========================================================================
+        // LIVE SIMULATOR ENGINE (2D PIXEL GRID SIMULATION)
+        // =========================================================================
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const GRID_SIZE = 128;
+        let grid = new Array(GRID_SIZE * GRID_SIZE).fill(null);
+
+        // Tool state
+        function setSimTool(tool) {
+            currentSimTool = tool;
+            document.querySelectorAll('.sim-tool-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-pixelAccent', 'text-white');
+                btn.classList.add('bg-pixelBg', 'text-gray-300');
+            });
+            const active = document.getElementById('tool-' + tool);
+            active.classList.add('active', 'bg-pixelAccent', 'text-white');
+            active.classList.remove('bg-pixelBg', 'text-gray-300');
+        }
+
+        function clearSimCanvas() {
+            grid.fill(null);
+        }
+
+        // Drawing on Canvas
+        let isDrawing = false;
+
+        function getCanvasCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = Math.floor((e.clientX - rect.left) * scaleX);
+            const y = Math.floor((e.clientY - rect.top) * scaleY);
+            return { x: Math.max(0, Math.min(GRID_SIZE - 1, x)), y: Math.max(0, Math.min(GRID_SIZE - 1, y)) };
+        }
+
+        function placeParticle(x, y) {
+            const data = generateElementData();
+            const brushSize = 2;
+
+            for (let dx = -brushSize; dx <= brushSize; dx++) {
+                for (let dy = -brushSize; dy <= brushSize; dy++) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+                    if (nx >= 0 && nx < GRID_SIZE && ny >= 0 && ny < GRID_SIZE) {
+                        const idx = ny * GRID_SIZE + nx;
+                        if (currentSimTool === 'element') {
+                            grid[idx] = {
+                                type: data.id,
+                                color: data.color,
+                                state: data.state,
+                                temp: 20,
+                                isCustom: true
+                            };
+                        } else if (currentSimTool === 'wall') {
+                            grid[idx] = { type: 'wall', color: '#64748b', state: 'solid', temp: 20 };
+                        } else if (currentSimTool === 'eraser') {
+                            grid[idx] = null;
+                        } else if (currentSimTool === 'heat') {
+                            if (grid[idx]) grid[idx].temp += 50;
+                        }
+                    }
+                }
+            }
+        }
+
+        canvas.addEventListener('mousedown', (e) => { isDrawing = true; placeParticle(...Object.values(getCanvasCoords(e))); });
+        canvas.addEventListener('mousemove', (e) => { 
+            const {x, y} = getCanvasCoords(e);
+            document.getElementById('simInfo').textContent = `X: ${x} Y: ${y} | Tool: ${currentSimTool}`;
+            if (isDrawing) placeParticle(x, y); 
+        });
+        window.addEventListener('mouseup', () => isDrawing = false);
+
+        // Physics Update Cycle
+        function updatePhysics() {
+            const data = generateElementData();
+            const nextGrid = [...grid];
+
+            for (let y = GRID_SIZE - 1; y >= 0; y--) {
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    const idx = y * GRID_SIZE + x;
+                    const p = grid[idx];
+                    if (!p) continue;
+
+                    // Wall physics
+                    if (p.type === 'wall') continue;
+
+                    // Heat reaction & State Changes
+                    if (p.isCustom) {
+                        if (data.highTemp !== "" && p.temp >= parseFloat(data.highTemp)) {
+                            grid[idx] = { type: data.stateHigh || 'fire', color: '#f97316', state: 'gas', temp: p.temp };
+                            continue;
+                        }
+
+                        // Emission Logic
+                        if (data.emit && Math.random() * 100 < data.emitChance) {
+                            const emX = x + Math.floor(Math.random() * 3) - 1;
+                            const emY = y + Math.floor(Math.random() * 3) - 1;
+                            if (emX >= 0 && emX < GRID_SIZE && emY >= 0 && emY < GRID_SIZE) {
+                                const emIdx = emY * GRID_SIZE + emX;
+                                if (!grid[emIdx]) {
+                                    nextGrid[emIdx] = { type: data.emit, color: '#a855f7', state: 'gas', temp: p.temp };
+                                }
+                            }
+                        }
+                    }
+
+                    // Movement Logic based on State
+                    if (p.state === 'solid' && !data.density) continue;
+
+                    if (p.state === 'solid' || p.state === 'liquid') {
+                        // Gravity down
+                        const below = (y + 1) * GRID_SIZE + x;
+                        if (y < GRID_SIZE - 1 && !nextGrid[below]) {
+                            nextGrid[below] = p;
+                            nextGrid[idx] = null;
+                        } else if (p.state === 'liquid' && y < GRID_SIZE - 1) {
+                            // Flow sideways
+                            const dir = Math.random() < 0.5 ? -1 : 1;
+                            const side = y * GRID_SIZE + (x + dir);
+                            if (x + dir >= 0 && x + dir < GRID_SIZE && !nextGrid[side]) {
+                                nextGrid[side] = p;
+                                nextGrid[idx] = null;
+                            }
+                        }
+                    } else if (p.state === 'gas') {
+                        // Rise up
+                        const above = (y - 1) * GRID_SIZE + x;
+                        if (y > 0 && !nextGrid[above]) {
+                            nextGrid[above] = p;
+                            nextGrid[idx] = null;
+                        } else {
+                            // Spread sideways
+                            const dir = Math.random() < 0.5 ? -1 : 1;
+                            const side = y * GRID_SIZE + (x + dir);
+                            if (x + dir >= 0 && x + dir < GRID_SIZE && !nextGrid[side]) {
+                                nextGrid[side] = p;
+                                nextGrid[idx] = null;
+                            }
+                        }
+                    }
+                }
+            }
+
+            grid = nextGrid;
+        }
+
+        // Render Canvas Loop
+        function renderSim() {
+            ctx.fillStyle = '#09090b';
+            ctx.fillRect(0, 0, GRID_SIZE, GRID_SIZE);
+
+            const imgData = ctx.getImageData(0, 0, GRID_SIZE, GRID_SIZE);
+            const pixels = imgData.data;
+
+            for (let i = 0; i < grid.length; i++) {
+                const p = grid[i];
+                if (p) {
+                    const pIdx = i * 4;
+                    let hex = p.color || '#ffffff';
+                    if (hex.startsWith('#')) {
+                        const r = parseInt(hex.slice(1, 3), 16);
+                        const g = parseInt(hex.slice(3, 5), 16);
+                        const b = parseInt(hex.slice(5, 7), 16);
+                        pixels[pIdx] = r;
+                        pixels[pIdx + 1] = g;
+                        pixels[pIdx + 2] = b;
+                        pixels[pIdx + 3] = 255;
+                    }
+                }
+            }
+
+            ctx.putImageData(imgData, 0, 0);
+        }
+
+        // Main Loop
+        function gameLoop() {
+            updatePhysics();
+            renderSim();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // INITIALIZATION
+        window.onload = function() {
+            renderReactions();
+            updateAll();
+            gameLoop();
+        };
+    </script>
+</body>
+</html>
