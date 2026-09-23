@@ -1,1336 +1,1230 @@
 <!DOCTYPE html>
 <html lang="de" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sandboxels Multi-Element Mod Creator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        pixelBg: '#0f0f15',
-                        pixelCard: '#181824',
-                        pixelCardHover: '#202030',
-                        pixelBorder: '#2e2e42',
-                        pixelAccent: '#6366f1',
-                        pixelAccentHover: '#4f46e5',
-                        sbYellow: '#eab308',
-                        sbGreen: '#22c55e',
-                        sbRed: '#ef4444',
-                        sbCyan: '#06b6d4',
-                        sbPurple: '#a855f7'
-                    },
-                    fontFamily: {
-                        pixel: ['"Press Start 2P"', 'monospace'],
-                        vt: ['VT323', 'monospace'],
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sandboxels Multi-Element Mod Creator</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Font: Inter & Silkscreen for Retro Pixel vibe -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Silkscreen&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            pixel: ['Silkscreen', 'cursive'],
+          },
+          colors: {
+            sandbox: {
+              bg: '#0f172a',
+              card: '#1e293b',
+              border: '#334155',
+              accent: '#3b82f6',
+              accentHover: '#2563eb',
+              pixelBg: '#090d16'
             }
+          }
         }
-    </script>
-    <style>
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f0f15;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #2e2e42;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #6366f1;
-        }
-        .pixel-border {
-            box-shadow: 0 0 0 2px #2e2e42;
-        }
-        .glow-accent {
-            box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
-        }
-        .custom-select-dark {
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 1em;
-        }
-    </style>
+      }
+    }
+  </script>
+  <style>
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    .pixel-border {
+      box-shadow: 0 0 0 2px #334155;
+    }
+    canvas {
+      image-rendering: pixelated;
+    }
+  </style>
 </head>
-<body class="bg-pixelBg text-gray-100 font-sans min-h-screen flex flex-col selection:bg-pixelAccent selection:text-white">
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
 
-    <header class="border-b border-pixelBorder bg-pixelCard/90 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-[1600px] mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-sbYellow via-sbGreen to-sbCyan rounded-lg flex items-center justify-center font-pixel text-slate-950 font-bold text-xl shadow-lg glow-accent">
-                    M
-                </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <h1 class="font-pixel text-sm sm:text-base text-yellow-400 tracking-wide">SANDBOXELS</h1>
-                        <span class="bg-pixelAccent/30 text-indigo-300 border border-pixelAccent/50 text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase">MULTI-ELEMENT CREATOR</span>
-                    </div>
-                    <p class="text-xs text-gray-400 font-vt tracking-wider text-base">Erstelle mehrere miteinander interagierende Elemente in einem Mod!</p>
-                </div>
-            </div>
-
-            <!-- Header Quick Actions -->
-            <div class="flex items-center gap-3 flex-wrap">
-                <div class="flex items-center gap-2 bg-pixelBg border border-pixelBorder px-3 py-1.5 rounded-lg text-xs">
-                    <i class="fa-solid fa-cubes text-sbCyan"></i>
-                    <span class="text-gray-400">Projekt:</span>
-                    <span id="projectCount" class="font-bold text-white font-mono">2 Elemente</span>
-                </div>
-
-                <select id="templateSelect" onchange="applyTemplateToNew(this.value)" class="bg-pixelBg border border-pixelBorder text-xs text-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-pixelAccent transition cursor-pointer">
-                    <option value="">➕ Vorlage als neues Element...</option>
-                    <option value="magicLiquid">🔮 Magische Flüssigkeit</option>
-                    <option value="radioactiveOre">☢️ Radioaktives Erz</option>
-                    <option value="resistantMetal">🛡️ Hitzebeständiges Metall</option>
-                    <option value="xenoAcid">🧪 Xeno-Säure</option>
-                    <option value="explosiveDust">💥 Explosiver Staub</option>
-                </select>
-
-                <button onclick="createNewElement()" class="bg-sbGreen hover:bg-emerald-600 text-slate-950 font-bold text-xs px-3.5 py-2 rounded-lg transition flex items-center gap-2 shadow-md">
-                    <i class="fa-solid fa-plus"></i> Neues Element
-                </button>
-            </div>
+  <!-- Top Navigation Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20 font-pixel text-xl">
+          SB
         </div>
-    </header>
+        <div>
+          <h1 class="font-pixel text-lg text-blue-400 tracking-wide">SANDBOXELS <span class="text-xs px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-sans font-semibold border border-blue-500/30">MOD STUDIO</span></h1>
+          <p class="text-xs text-slate-400">Multi-Element Mod & Physik-Simulator Creator</p>
+        </div>
+      </div>
 
-    <main class="flex-1 max-w-[1600px] w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="flex items-center gap-2">
+        <button id="btnExportMod" onclick="openExportModal()" class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium text-sm rounded-lg shadow-lg shadow-emerald-900/30 flex items-center gap-2 transition">
+          <i class="fa-solid fa-file-code"></i> Mod Exporieren (.js)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Grid Layout -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LEFT PANEL: Element List & Quick Controls (Cols 3) -->
+    <section class="lg:col-span-3 flex flex-col gap-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col h-[calc(100vh-120px)] sticky top-20 shadow-xl">
+        <div class="flex items-center justify-between mb-3 pb-3 border-b border-slate-800">
+          <h2 class="font-semibold text-slate-200 flex items-center gap-2">
+            <i class="fa-solid fa-cubes text-blue-400"></i> Elemente (<span id="elementCount">0</span>)
+          </h2>
+          <button onclick="createNewElement()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-md flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-plus"></i> Neu
+          </button>
+        </div>
+
+        <!-- Elements Scroll List -->
+        <div id="elementsList" class="flex-1 overflow-y-auto space-y-2 pr-1">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <!-- Simulator Quick Toggle & Presets -->
+        <div class="mt-4 pt-3 border-t border-slate-800 flex flex-col gap-2">
+          <button onclick="scrollSection('simulatorSection')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium flex items-center justify-center gap-2 border border-slate-700 transition">
+            <i class="fa-solid fa-vial-circle-check text-emerald-400"></i> Zum Simulator springen
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTER PANEL: Comprehensive Attribute Editor (Cols 5) -->
+    <section class="lg:col-span-5 flex flex-col gap-6">
+      <div id="editorCard" class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl flex flex-col gap-6">
         
-        <!-- LEFT COLUMN: Multi-Element List & Manager (3 Cols) -->
-        <div class="lg:col-span-3 flex flex-col gap-4">
-            
-            <div class="bg-pixelCard border border-pixelBorder rounded-xl p-4 shadow-xl flex flex-col gap-3">
-                <div class="flex items-center justify-between border-b border-pixelBorder pb-2">
-                    <h2 class="font-pixel text-xs text-yellow-400 flex items-center gap-2">
-                        <i class="fa-solid fa-layer-group"></i> ELEMENTE IM MOD
-                    </h2>
-                    <span class="text-[10px] text-gray-400 font-mono" id="elementListBadge">2/50</span>
-                </div>
-
-                <!-- Element List Sidebar -->
-                <div id="elementList" class="space-y-2 max-h-[600px] overflow-y-auto pr-1">
-                    <!-- Dynamic Element Cards inserted here -->
-                </div>
-
-                <!-- Add & Quick Actions -->
-                <div class="pt-2 border-t border-pixelBorder flex gap-2">
-                    <button onclick="createNewElement()" class="flex-1 bg-pixelBg hover:bg-pixelBorder text-gray-200 border border-pixelBorder text-xs py-2 rounded-lg transition flex items-center justify-center gap-1.5 font-medium">
-                        <i class="fa-solid fa-plus text-sbGreen"></i> Element hinzufügen
-                    </button>
-                    <button onclick="duplicateActiveElement()" class="bg-pixelBg hover:bg-pixelBorder text-gray-200 border border-pixelBorder text-xs px-3 py-2 rounded-lg transition" title="Aktives Element duplizieren">
-                        <i class="fa-solid fa-clone text-sbCyan"></i>
-                    </button>
-                </div>
+        <!-- Header & Action bar for Selected Element -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div class="flex items-center gap-3">
+            <input type="color" id="elemColorPicker" class="w-9 h-9 rounded cursor-pointer border-0 bg-transparent" onchange="updateCurrentElement('color', this.value)">
+            <div>
+              <h2 id="activeElemTitle" class="font-bold text-lg text-white">Element Bearbeiten</h2>
+              <p class="text-xs text-slate-400 font-mono" id="activeElemIdText">ID: example_element</p>
             </div>
-
-            <!-- Quick Info Box -->
-            <div class="bg-pixelCard/50 border border-pixelBorder/60 rounded-xl p-3 text-xs text-gray-400 space-y-2">
-                <div class="flex items-center gap-1.5 text-yellow-400 font-bold text-[11px]">
-                    <i class="fa-solid fa-lightbulb"></i> Profi-Tipp für Interaktionen:
-                </div>
-                <p class="leading-relaxed">
-                    Verweise bei <span class="text-white">Schmelzpunkt (highTemp)</span> oder <span class="text-white">Reaktionen</span> direkt auf die ID eines anderen neu erstellten Elements im selben Mod!
-                </p>
-            </div>
-
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="duplicateCurrentElement()" title="Duplizieren" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs transition border border-slate-700">
+              <i class="fa-solid fa-copy"></i>
+            </button>
+            <button onclick="deleteCurrentElement()" title="Löschen" class="p-2 bg-red-950/50 hover:bg-red-900/80 text-red-400 rounded-lg text-xs transition border border-red-800/50">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
         </div>
 
-        <!-- MIDDLE COLUMN: Active Element Form Editor (5 Cols) -->
-        <div class="lg:col-span-5 flex flex-col gap-4">
-            
-            <!-- Editor Header & Tabs -->
-            <div class="bg-pixelCard border border-pixelBorder rounded-xl p-4 shadow-xl flex flex-col gap-4">
-                
-                <div class="flex items-center justify-between border-b border-pixelBorder pb-3">
-                    <div class="flex items-center gap-2">
-                        <div id="activeElemColorBadge" class="w-5 h-5 rounded-md border border-white/20" style="background-color: #ff5500;"></div>
-                        <h2 id="activeElemTitle" class="font-pixel text-sm text-white">Element Editor</h2>
-                    </div>
-                    <button onclick="deleteActiveElement()" class="text-red-400 hover:text-red-300 hover:bg-red-950/40 border border-red-800/40 text-xs px-2.5 py-1 rounded transition flex items-center gap-1">
-                        <i class="fa-solid fa-trash"></i> Löschen
-                    </button>
-                </div>
-
-                <!-- Navigation Tabs -->
-                <div class="flex flex-wrap gap-1.5 border-b border-pixelBorder pb-2 text-xs font-semibold">
-                    <button onclick="switchTab('basic')" id="tab-basic" class="tab-btn active bg-pixelAccent text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
-                        <i class="fa-solid fa-cube"></i> Basis
-                    </button>
-                    <button onclick="switchTab('state')" id="tab-state" class="tab-btn bg-pixelBg text-gray-400 hover:text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
-                        <i class="fa-solid fa-temperature-three-quarters"></i> Physik & Phase
-                    </button>
-                    <button onclick="switchTab('combustion')" id="tab-combustion" class="tab-btn bg-pixelBg text-gray-400 hover:text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
-                        <i class="fa-solid fa-fire"></i> Brand & Bumm
-                    </button>
-                    <button onclick="switchTab('emission')" id="tab-emission" class="tab-btn bg-pixelBg text-gray-400 hover:text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
-                        <i class="fa-solid fa-radiation"></i> Emission
-                    </button>
-                    <button onclick="switchTab('reactions')" id="tab-reactions" class="tab-btn bg-pixelBg text-gray-400 hover:text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
-                        <i class="fa-solid fa-flask"></i> Reaktionen
-                    </button>
-                    <button onclick="switchTab('advanced')" id="tab-advanced" class="tab-btn bg-pixelBg text-gray-400 hover:text-white px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
-                        <i class="fa-solid fa-code"></i> Tick / Code
-                    </button>
-                </div>
-
-                <!-- TAB CONTENTS -->
-                <div id="editorForm" class="space-y-4 pt-1">
-                    
-                    <!-- 1. BASIC PROPERTIES -->
-                    <div id="section-basic" class="tab-content space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Element Name <span class="text-red-400">*</span></label>
-                                <input type="text" id="propName" oninput="updateActiveElementFromForm()" placeholder="z.B. Magma Erz" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Identifier (`id`) <span class="text-red-400">*</span></label>
-                                <input type="text" id="propId" oninput="updateActiveElementFromForm()" placeholder="z.B. magma_ore" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none font-mono">
-                                <p class="text-[10px] text-gray-500 mt-1">Nur Kleinbuchstaben & Unterstriche.</p>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Kategorie (`category`)</label>
-                                <select id="propCategory" onchange="updateActiveElementFromForm()" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none custom-select-dark">
-                                    <option value="land">Land (Boden / Gestein / Erze)</option>
-                                    <option value="powders">Powders (Pulver / Sand)</option>
-                                    <option value="liquids">Liquids (Flüssigkeiten)</option>
-                                    <option value="gases">Gases (Gase / Dämpfe)</option>
-                                    <option value="energy">Energy (Energie / Plasma / Feuer)</option>
-                                    <option value="life">Life (Organisch / Biologie)</option>
-                                    <option value="weapons">Weapons (Waffen / Bomben)</option>
-                                    <option value="special">Special (Spezial / Magie)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Farbe (`color`)</label>
-                                <div class="flex gap-2">
-                                    <input type="color" id="propColor" onchange="syncColorInput(this.value)" class="h-9 w-12 bg-pixelBg border border-pixelBorder rounded-lg cursor-pointer p-0.5">
-                                    <input type="text" id="propColorText" oninput="syncColorPicker(this.value)" class="flex-1 bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-pixelAccent focus:outline-none">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-medium text-gray-300 mb-1">Beschreibung (`desc`)</label>
-                            <textarea id="propDesc" oninput="updateActiveElementFromForm()" rows="2" placeholder="Kurze Beschreibung im Spiel-Tooltip..." class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none"></textarea>
-                        </div>
-                    </div>
-
-                    <!-- 2. STATE & PHYSICAL PROPERTIES -->
-                    <div id="section-state" class="tab-content hidden space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Aggregatzustand (`state`)</label>
-                                <select id="propState" onchange="updateActiveElementFromForm()" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none custom-select-dark">
-                                    <option value="solid">Solid (Feststoff)</option>
-                                    <option value="liquid">Liquid (Flüssigkeit)</option>
-                                    <option value="gas">Gas (Gasförmig)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Dichte (`density`)</label>
-                                <input type="number" id="propDensity" oninput="updateActiveElementFromForm()" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
-                                <p class="text-[10px] text-gray-500 mt-1">Wasser = 1000. Schwerer sinkt.</p>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Viskosität (`viscosity`)</label>
-                                <input type="number" id="propViscosity" oninput="updateActiveElementFromForm()" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
-                                <p class="text-[10px] text-gray-500 mt-1">Fließträgheit (bei Liquid).</p>
-                            </div>
-                        </div>
-
-                        <div class="p-3 bg-pixelBg/50 border border-pixelBorder rounded-xl space-y-3">
-                            <span class="text-xs font-bold text-yellow-400 flex items-center gap-1.5"><i class="fa-solid fa-temperature-high"></i> Schmelzen / Verdampfen (Hohe Temp)</span>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs text-gray-400 mb-1">Schmelzpunkt (°C) [`tempHigh`]</label>
-                                    <input type="number" id="propHighTemp" oninput="updateActiveElementFromForm()" placeholder="z.B. 1200" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs text-gray-400 mb-1">Wird zu Element [`stateHigh`]</label>
-                                    <select id="propStateHigh" onchange="updateActiveElementFromForm()" class="elem-picker w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none custom-select-dark">
-                                        <!-- Dynamic options -->
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="p-3 bg-pixelBg/50 border border-pixelBorder rounded-xl space-y-3">
-                            <span class="text-xs font-bold text-cyan-400 flex items-center gap-1.5"><i class="fa-solid fa-snowflake"></i> Gefrieren / Kondensieren (Niedrige Temp)</span>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs text-gray-400 mb-1">Gefrierpunkt (°C) [`tempLow`]</label>
-                                    <input type="number" id="propLowTemp" oninput="updateActiveElementFromForm()" placeholder="z.B. 0" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs text-gray-400 mb-1">Wird zu Element [`stateLow`]</label>
-                                    <select id="propStateLow" onchange="updateActiveElementFromForm()" class="elem-picker w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none custom-select-dark">
-                                        <!-- Dynamic options -->
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 3. COMBUSTION & EXPLOSION -->
-                    <div id="section-combustion" class="tab-content hidden space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Brennchance % [`burn`]</label>
-                                <input type="number" id="propBurn" min="0" max="100" oninput="updateActiveElementFromForm()" placeholder="0 - 100" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Brenndauer Ticks [`burnTime`]</label>
-                                <input type="number" id="propBurnTime" oninput="updateActiveElementFromForm()" placeholder="z.B. 100" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Entzündungstemp (°C) [`burnTemp`]</label>
-                                <input type="number" id="propBurnTemp" oninput="updateActiveElementFromForm()" placeholder="z.B. 400" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Brennt zu [`burnInto`]</label>
-                                <select id="propBurnInto" onchange="updateActiveElementFromForm()" class="elem-picker w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none custom-select-dark">
-                                    <!-- Dynamic options -->
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Explosion [`explosionType`]</label>
-                                <select id="propExplosionType" onchange="updateActiveElementFromForm()" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none custom-select-dark">
-                                    <option value="">Keine Explosion</option>
-                                    <option value="1">Kleine Explosion (1)</option>
-                                    <option value="2">Mittlere Explosion (2)</option>
-                                    <option value="3">Große Explosion (3)</option>
-                                    <option value="nuke">Atomare Nuke Explosion</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 4. EMISSION & RADIOACTIVITY -->
-                    <div id="section-emission" class="tab-content hidden space-y-4">
-                        <p class="text-xs text-gray-400">
-                            Lässt das Element kontinuierlich andere Partikel/Strahlung abgeben (wie Radioaktivität, Rauch, Licht oder Dämpfe).
-                        </p>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Emittiert Element [`emit`]</label>
-                                <select id="propEmit" onchange="updateActiveElementFromForm()" class="elem-picker w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none custom-select-dark">
-                                    <!-- Dynamic options -->
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Emissions-Chance % [`emitChance`]</label>
-                                <input type="number" id="propEmitChance" min="0" max="100" oninput="updateActiveElementFromForm()" placeholder="0 - 100" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Anzahl Partikel [`emitNum`]</label>
-                                <input type="number" id="propEmitNum" min="1" max="10" oninput="updateActiveElementFromForm()" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 5. REACTIONS -->
-                    <div id="section-reactions" class="tab-content hidden space-y-4">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs text-gray-400">Was passiert, wenn dieses Element ein anderes berührt:</span>
-                            <button onclick="addReactionRow()" class="bg-pixelAccent hover:bg-pixelAccentHover text-white text-xs px-2.5 py-1 rounded-lg transition flex items-center gap-1">
-                                <i class="fa-solid fa-plus"></i> Reaktion
-                            </button>
-                        </div>
-
-                        <div id="reactionsContainer" class="space-y-2">
-                            <!-- Dynamic Reaction Rows -->
-                        </div>
-                    </div>
-
-                    <!-- 6. ADVANCED & CUSTOM TICK -->
-                    <div id="section-advanced" class="tab-content hidden space-y-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Härte (Hardness 0-1)</label>
-                                <input type="number" step="0.1" id="propHardness" oninput="updateActiveElementFromForm()" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Leitfähig (`conduct`)</label>
-                                <input type="number" step="0.1" id="propConduct" oninput="updateActiveElementFromForm()" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-300 mb-1">Färbend (`stain` %)</label>
-                                <input type="number" id="propStain" oninput="updateActiveElementFromForm()" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-sm text-white focus:border-pixelAccent focus:outline-none">
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-2 pt-1">
-                            <input type="checkbox" id="propHidden" onchange="updateActiveElementFromForm()" class="w-4 h-4 rounded bg-pixelBg border-pixelBorder text-pixelAccent focus:ring-0 cursor-pointer">
-                            <label for="propHidden" class="text-xs text-gray-300 cursor-pointer">Aus Menüleiste ausblenden (`hidden: true`)</label>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-medium text-gray-300 mb-1">Custom Tick Logik (`tick: function(pixel) { ... }`)</label>
-                            <textarea id="propTickCode" oninput="updateActiveElementFromForm()" rows="3" placeholder="// z.B. pixel.temp += 0.5;" class="w-full bg-pixelBg border border-pixelBorder rounded-lg px-3 py-2 text-xs font-mono text-emerald-400 focus:border-pixelAccent focus:outline-none"></textarea>
-                            <p class="text-[10px] text-gray-500 mt-1">Wird jeden Frame für jedes Partikel ausgeführt.</p>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
+        <!-- TAB NAVIGATION FOR EDITOR -->
+        <div class="flex border-b border-slate-800 text-xs font-medium">
+          <button id="tabBtnBasic" onclick="switchEditorTab('basic')" class="py-2 px-3 border-b-2 border-blue-500 text-blue-400 font-semibold">
+            Grundeigenschaften
+          </button>
+          <button id="tabBtnPhys" onclick="switchEditorTab('physics')" class="py-2 px-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+            Physik & Hitze
+          </button>
+          <button id="tabBtnReactions" onclick="switchEditorTab('reactions')" class="py-2 px-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+            Reaktionen & Emission
+          </button>
+          <button id="tabBtnCode" onclick="switchEditorTab('code')" class="py-2 px-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+            Tick-Code (JS)
+          </button>
         </div>
 
-        <!-- RIGHT COLUMN: Multi-Element Simulator & Combined Mod Code (4 Cols) -->
-        <div class="lg:col-span-4 flex flex-col gap-6">
-            
-            <!-- SIMULATOR CANVAS PREVIEW -->
-            <div class="bg-pixelCard border border-pixelBorder rounded-xl p-4 shadow-xl flex flex-col gap-3">
-                <div class="flex justify-between items-center border-b border-pixelBorder pb-2">
-                    <h3 class="font-pixel text-xs text-yellow-400 flex items-center gap-2">
-                        <i class="fa-solid fa-gamepad"></i> SIMULATOR (LIVE TEST)
-                    </h3>
-                    <div class="flex items-center gap-2">
-                        <button onclick="toggleSimPause()" id="simPauseBtn" class="bg-pixelBg hover:bg-pixelBorder text-xs text-gray-200 px-2 py-0.5 rounded border border-pixelBorder">
-                            <i class="fa-solid fa-pause"></i>
-                        </button>
-                        <span class="text-[10px] bg-pixelBg text-emerald-400 px-2 py-0.5 rounded font-mono border border-emerald-500/30">60 FPS</span>
-                    </div>
-                </div>
+        <!-- TAB 1: BASIC PROPERTIES -->
+        <div id="tabBasic" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Identifier (ID)</label>
+              <input type="text" id="elemId" oninput="updateCurrentElement('id', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 font-mono focus:border-blue-500 focus:outline-none">
+              <span class="text-[10px] text-slate-500">Nur Kleinbuchstaben & _ (z.B. super_lava)</span>
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Name (Anzeige)</label>
+              <input type="text" id="elemName" oninput="updateCurrentElement('name', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-blue-500 focus:outline-none">
+            </div>
+          </div>
 
-                <!-- Canvas Component -->
-                <div class="relative bg-black rounded-lg overflow-hidden border border-pixelBorder aspect-square w-full flex items-center justify-center">
-                    <canvas id="simCanvas" width="128" height="128" class="w-full h-full image-rendering-pixelated cursor-crosshair"></canvas>
-                    
-                    <!-- Overlay Tooltip -->
-                    <div id="simInfo" class="absolute bottom-2 left-2 bg-pixelBg/90 backdrop-blur text-[10px] font-mono px-2 py-1 rounded text-gray-300 border border-pixelBorder pointer-events-none">
-                        Wähle Element zum Zeichnen
-                    </div>
-                </div>
-
-                <!-- Controls for Simulator -->
-                <div class="flex flex-col gap-2 text-xs">
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        <span class="text-[10px] text-gray-400">Zeichne:</span>
-                        <select id="simElementSelect" class="flex-1 bg-pixelBg border border-pixelBorder rounded px-2 py-1 text-xs text-white focus:outline-none custom-select-dark">
-                            <!-- Populated with Custom + Standard Elements -->
-                        </select>
-                    </div>
-
-                    <div class="flex flex-wrap items-center justify-between gap-1.5">
-                        <div class="flex gap-1">
-                            <button onclick="setSimTool('draw')" id="tool-draw" class="sim-tool-btn active bg-pixelAccent text-white px-2 py-1 rounded text-xs">
-                                ✏️ Malen
-                            </button>
-                            <button onclick="setSimTool('wall')" id="tool-wall" class="sim-tool-btn bg-pixelBg text-gray-300 px-2 py-1 rounded text-xs">
-                                🧱 Wand
-                            </button>
-                            <button onclick="setSimTool('eraser')" id="tool-eraser" class="sim-tool-btn bg-pixelBg text-gray-300 px-2 py-1 rounded text-xs">
-                                🧹 Radieren
-                            </button>
-                            <button onclick="setSimTool('heat')" id="tool-heat" class="sim-tool-btn bg-pixelBg text-gray-300 px-2 py-1 rounded text-xs">
-                                🔥 Hitze
-                            </button>
-                        </div>
-
-                        <button onclick="clearSimCanvas()" class="bg-red-900/40 hover:bg-red-800/60 text-red-300 px-2 py-1 rounded border border-red-700/40 text-xs">
-                            <i class="fa-solid fa-trash"></i> Leeren
-                        </button>
-                    </div>
-                </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Kategorie (Ohne Machines)</label>
+              <select id="elemCategory" onchange="updateCurrentElement('category', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-blue-500 focus:outline-none">
+                <option value="land">Land (Boden/Gestein)</option>
+                <option value="powder">Powder (Pulver/Sand)</option>
+                <option value="liquids">Liquids (Flüssigkeiten)</option>
+                <option value="gases">Gases (Gase)</option>
+                <option value="fire">Fire (Feuer/Hitze)</option>
+                <option value="explosives">Explosives (Sprengstoff)</option>
+                <option value="states">States (Zustände)</option>
+                <option value="life">Life (Biologie/Leben)</option>
+                <option value="weapons">Weapons (Waffen)</option>
+                <option value="food">Food (Nahrungsmittel)</option>
+                <option value="fey">Fey (Magie/Spezial)</option>
+                <option value="special">Special (Besonderes)</option>
+                <option value="energy">Energy (Energie)</option>
+                <option value="tools">Tools (Werkzeuge)</option>
+                <option value="corruption">Corruption (Verderbnis)</option>
+              </select>
             </div>
 
-            <!-- COMBINED EXPORT & CODE OUTPUT -->
-            <div class="bg-pixelCard border border-pixelBorder rounded-xl p-4 shadow-xl flex-1 flex flex-col gap-3">
-                <div class="flex justify-between items-center border-b border-pixelBorder pb-2">
-                    <h3 class="font-pixel text-xs text-sbCyan flex items-center gap-2">
-                        <i class="fa-solid fa-code"></i> MOD EXPORT (.JS)
-                    </h3>
-                    <div class="flex gap-1.5">
-                        <button onclick="copyCode()" class="bg-pixelBorder hover:bg-pixelAccent text-white text-xs px-2 py-1 rounded transition flex items-center gap-1">
-                            <i class="fa-solid fa-copy"></i>
-                        </button>
-                        <button onclick="downloadCode()" class="bg-pixelAccent hover:bg-pixelAccentHover text-white text-xs px-2.5 py-1 rounded transition flex items-center gap-1 font-semibold">
-                            <i class="fa-solid fa-download"></i> Download
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Code Container -->
-                <pre class="bg-pixelBg border border-pixelBorder rounded-lg p-3 text-[11px] font-mono text-emerald-400 overflow-x-auto max-h-56 flex-1 select-all" id="codeOutput"></pre>
-
-                <!-- Instructions Accordion -->
-                <details class="bg-pixelBg/40 border border-pixelBorder rounded-lg p-2.5 text-xs text-gray-300">
-                    <summary class="cursor-pointer font-semibold text-yellow-400 flex items-center gap-1.5">
-                        <i class="fa-solid fa-circle-info"></i> Mod in Sandboxels laden
-                    </summary>
-                    <ol class="list-decimal list-inside space-y-1 mt-2 text-gray-400 pl-1 text-[11px]">
-                        <li>Öffne <a href="https://sandboxels.org" target="_blank" class="text-pixelAccent underline font-bold">Sandboxels.org</a>.</li>
-                        <li>Öffne die Entwickler-Konsole mit <kbd class="bg-pixelBg px-1 rounded border border-pixelBorder text-gray-200">F12</kbd>.</li>
-                        <li>Füge den kopierten Code ein & drücke <kbd class="bg-pixelBg px-1 rounded border border-pixelBorder text-gray-200">Enter</kbd>.</li>
-                        <li>Oder lade die <code class="text-sbCyan">.js</code> Datei im Sandboxels Mod Manager hoch!</li>
-                    </ol>
-                </details>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Aggregatzustand / Verhalten</label>
+              <select id="elemState" onchange="updateCurrentElement('state', this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-blue-500 focus:outline-none">
+                <option value="solid">Solid (Feststoff)</option>
+                <option value="powder">Powder (Fällt wie Sand)</option>
+                <option value="liquid">Liquid (Fließt)</option>
+                <option value="denser_liquid">Denser Liquid (Schwere Flüssigkeit)</option>
+                <option value="gas">Gas (Steigt auf)</option>
+                <option value="energy">Energy (Strahlung/Plasma)</option>
+                <option value="wall">Wall (Unzerstörbar)</option>
+                <option value="immovable">Immovable (Fest/Unbeweglich)</option>
+              </select>
             </div>
+          </div>
 
+          <div>
+            <label class="block text-xs text-slate-400 mb-1">Farbe Hex / Farbcode</label>
+            <div class="flex gap-2">
+              <input type="text" id="elemColorText" oninput="updateCurrentElement('color', this.value)" class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 font-mono focus:border-blue-500 focus:outline-none">
+            </div>
+          </div>
         </div>
 
-    </main>
+        <!-- TAB 2: PHYSICS & TEMPERATURE -->
+        <div id="tabPhysics" class="space-y-4 hidden">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Dichte (Density)</label>
+              <input type="number" id="elemDensity" oninput="updateCurrentElement('density', parseFloat(this.value))" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-blue-500 focus:outline-none">
+              <span class="text-[10px] text-slate-500">z.B. Wasser: 1000, Öl: 800, Stein: 2500</span>
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Härte (Hardness 0 - 1)</label>
+              <input type="number" step="0.05" min="0" max="1" id="elemHardness" oninput="updateCurrentElement('hardness', parseFloat(this.value))" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-blue-500 focus:outline-none">
+            </div>
+          </div>
 
-    <script>
-        // STANDARD SANDBOXELS BUILT-IN ELEMENTS LIST FOR DROPDOWNS
-        const standardElements = [
-            { id: '', name: '-- Kein Element / Keins --' },
-            { id: 'water', name: '💧 Water (Wasser)' },
-            { id: 'fire', name: '🔥 Fire (Feuer)' },
-            { id: 'magma', name: '🌋 Magma / Lava' },
-            { id: 'stone', name: '🪨 Stone (Stein)' },
-            { id: 'sand', name: '⏳ Sand' },
-            { id: 'steam', name: '💨 Steam (Dampf)' },
-            { id: 'ice', name: '🧊 Ice (Eis)' },
-            { id: 'ash', name: '🌫️ Ash (Asche)' },
-            { id: 'smoke', name: '🌫️ Smoke (Rauch)' },
-            { id: 'plant', name: '🌱 Plant (Pflanze)' },
-            { id: 'acid', name: '🧪 Acid (Säure)' },
-            { id: 'radiation', name: '☢️ Radiation (Strahlung)' },
-            { id: 'explosion', name: '💥 Explosion' },
-            { id: 'dirty_water', name: '🦠 Dirty Water' },
-            { id: 'basalt', name: '⬛ Basalt' },
-            { id: 'glass', name: '🪟 Glass' }
-        ];
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Viskosität (Viscosity)</label>
+              <input type="number" id="elemViscosity" oninput="updateCurrentElement('viscosity', parseFloat(this.value))" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-blue-500 focus:outline-none">
+              <span class="text-[10px] text-slate-500">Für Flüssigkeiten (Trägheit)</span>
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Leitfähigkeit (Conduct 0 - 1)</label>
+              <input type="number" step="0.05" min="0" max="1" id="elemConduct" oninput="updateCurrentElement('conduct', parseFloat(this.value))" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-blue-500 focus:outline-none">
+            </div>
+          </div>
 
-        // GLOBAL MULTI-ELEMENT PROJECT STATE
-        let elementsProject = [
-            {
-                id: 'magma_ore',
-                name: 'Magma Erz',
-                category: 'land',
-                color: '#e65100',
-                desc: 'Ein glühendes Erz, das bei Hitze zu Magma-Gas verdampft.',
-                state: 'solid',
-                density: 3000,
-                viscosity: 1,
-                highTemp: 1400,
-                stateHigh: 'magma_gas', // Points to 2nd custom element!
-                lowTemp: '',
-                stateLow: '',
-                burn: 0,
-                burnTime: 0,
-                burnTemp: 0,
-                burnInto: '',
-                explosionType: '',
-                emit: 'fire',
-                emitChance: 10,
-                emitNum: 1,
-                hardness: 0.8,
-                conduct: 0.5,
-                stain: 0,
-                hidden: false,
-                tickCode: 'pixel.temp += 0.2;',
-                reactions: [
-                    { target: 'water', result: 'basalt' }
-                ]
-            },
-            {
-                id: 'magma_gas',
-                name: 'Magma Gas',
-                category: 'gases',
-                color: '#ff9800',
-                desc: 'Heiße Gase, die beim Schmelzen von Magma-Erz entstehen.',
-                state: 'gas',
-                density: -50,
-                viscosity: 1,
-                highTemp: '',
-                stateHigh: '',
-                lowTemp: 800,
-                stateLow: 'magma_ore', // Points back to 1st custom element!
-                burn: 60,
-                burnTime: 80,
-                burnTemp: 300,
-                burnInto: 'fire',
-                explosionType: '1',
-                emit: 'smoke',
-                emitChance: 20,
-                emitNum: 1,
-                hardness: 0,
-                conduct: 0.2,
-                stain: 10,
-                hidden: false,
-                tickCode: '',
-                reactions: []
-            }
-        ];
+          <div class="border-t border-slate-800 pt-3">
+            <h3 class="text-xs font-semibold text-blue-400 mb-3">Temperatur & Zustandsänderungen</h3>
+            
+            <div class="grid grid-cols-2 gap-4 mb-3">
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Schmelztemp (°C) `tempHigh`</label>
+                <input type="number" id="elemTempHigh" oninput="updateCurrentElement('tempHigh', parseFloat(this.value))" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-blue-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Schmelz-Produkt `stateHigh`</label>
+                <input type="text" id="elemStateHigh" oninput="updateCurrentElement('stateHigh', this.value)" placeholder="z.B. lava, magma, fire" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 font-mono focus:border-blue-500 focus:outline-none">
+                <!-- Suggestion Pills -->
+                <div class="flex flex-wrap gap-1 mt-1">
+                  <span onclick="setField('elemStateHigh', 'lava', 'stateHigh')" class="cursor-pointer text-[10px] bg-slate-800 hover:bg-slate-700 px-1.5 py-0.5 rounded text-slate-300">lava</span>
+                  <span onclick="setField('elemStateHigh', 'fire', 'stateHigh')" class="cursor-pointer text-[10px] bg-slate-800 hover:bg-slate-700 px-1.5 py-0.5 rounded text-slate-300">fire</span>
+                  <span onclick="setField('elemStateHigh', 'gas', 'stateHigh')" class="cursor-pointer text-[10px] bg-slate-800 hover:bg-slate-700 px-1.5 py-0.5 rounded text-slate-300">gas</span>
+                </div>
+              </div>
+            </div>
 
-        let activeIndex = 0;
-        let simPaused = false;
-        let currentSimTool = 'draw';
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Gefriertemp (°C) `tempLow`</label>
+                <input type="number" id="elemTempLow" oninput="updateCurrentElement('tempLow', parseFloat(this.value))" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-blue-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Gefrier-Produkt `stateLow`</label>
+                <input type="text" id="elemStateLow" oninput="updateCurrentElement('stateLow', this.value)" placeholder="z.B. ice, basalt, stone" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 font-mono focus:border-blue-500 focus:outline-none">
+                <!-- Suggestion Pills -->
+                <div class="flex flex-wrap gap-1 mt-1">
+                  <span onclick="setField('elemStateLow', 'ice', 'stateLow')" class="cursor-pointer text-[10px] bg-slate-800 hover:bg-slate-700 px-1.5 py-0.5 rounded text-slate-300">ice</span>
+                  <span onclick="setField('elemStateLow', 'stone', 'stateLow')" class="cursor-pointer text-[10px] bg-slate-800 hover:bg-slate-700 px-1.5 py-0.5 rounded text-slate-300">stone</span>
+                  <span onclick="setField('elemStateLow', 'snow', 'stateLow')" class="cursor-pointer text-[10px] bg-slate-800 hover:bg-slate-700 px-1.5 py-0.5 rounded text-slate-300">snow</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-        const templates = {
-            magicLiquid: {
-                name: "Magische Essenzen",
-                id: "magic_essence",
-                category: "special",
-                color: "#9c27b0",
-                desc: "Eine schimmernde Flüssigkeit mit hoher Magiekraft.",
-                state: "liquid",
-                density: 900,
-                viscosity: 2,
-                highTemp: 500,
-                stateHigh: "fire",
-                lowTemp: -20,
-                stateLow: "ice",
-                burn: 0,
-                burnTime: 0,
-                burnTemp: 0,
-                burnInto: "",
-                explosionType: "",
-                emit: "radiation",
-                emitChance: 15,
-                emitNum: 1,
-                hardness: 0,
-                conduct: 0.9,
-                stain: 30,
-                hidden: false,
-                tickCode: "",
-                reactions: [{ target: 'water', result: 'steam' }]
-            },
-            radioactiveOre: {
-                name: "Uran Kristall",
-                id: "uranium_crystal",
-                category: "land",
-                color: "#00e676",
-                desc: "Stark radioaktiver grüner Kristall.",
-                state: "solid",
-                density: 5000,
-                viscosity: 1,
-                highTemp: 2000,
-                stateHigh: "magma",
-                lowTemp: "",
-                stateLow: "",
-                burn: 0,
-                burnTime: 0,
-                burnTemp: 0,
-                burnInto: "",
-                explosionType: "nuke",
-                emit: "radiation",
-                emitChance: 50,
-                emitNum: 2,
-                hardness: 0.9,
-                conduct: 0.8,
-                stain: 20,
-                hidden: false,
-                tickCode: "pixel.temp += 1;",
-                reactions: []
-            },
-            resistantMetal: {
-                name: "Titan Legierung",
-                id: "titanium_alloy",
-                category: "land",
-                color: "#78909c",
-                desc: "Extrem hitzebeständiges Metall.",
-                state: "solid",
-                density: 4500,
-                viscosity: 1,
-                highTemp: 3000,
-                stateHigh: "magma",
-                lowTemp: "",
-                stateLow: "",
-                burn: 0,
-                burnTime: 0,
-                burnTemp: 0,
-                burnInto: "",
-                explosionType: "",
-                emit: "",
-                emitChance: 0,
-                emitNum: 1,
-                hardness: 1.0,
-                conduct: 0.9,
-                stain: 0,
-                hidden: false,
-                tickCode: "",
-                reactions: []
-            },
-            xenoAcid: {
-                name: "Xeno Säure",
-                id: "xeno_acid",
-                category: "liquids",
-                color: "#a3e635",
-                desc: "Ätzende Säure, die Stein zersetzt.",
-                state: "liquid",
-                density: 1200,
-                viscosity: 2,
-                highTemp: 300,
-                stateHigh: "smoke",
-                lowTemp: -10,
-                stateLow: "ice",
-                burn: 0,
-                burnTime: 0,
-                burnTemp: 0,
-                burnInto: "",
-                explosionType: "",
-                emit: "smoke",
-                emitChance: 5,
-                emitNum: 1,
-                hardness: 0,
-                conduct: 0.5,
-                stain: 40,
-                hidden: false,
-                tickCode: "",
-                reactions: [{ target: 'stone', result: 'dirty_water' }]
-            },
-            explosiveDust: {
-                name: "Nitro Pulver",
-                id: "nitro_dust",
-                category: "powders",
-                color: "#ff1744",
-                desc: "Hochexplosives rotes Pulver.",
-                state: "solid",
-                density: 1100,
-                viscosity: 1,
-                highTemp: 100,
-                stateHigh: "fire",
-                lowTemp: "",
-                stateLow: "",
-                burn: 100,
-                burnTime: 5,
-                burnTemp: 50,
-                burnInto: "fire",
-                explosionType: "2",
-                emit: "",
-                emitChance: 0,
-                emitNum: 1,
-                hardness: 0.1,
-                conduct: 0.1,
-                stain: 0,
-                hidden: false,
-                tickCode: "",
-                reactions: [{ target: 'fire', result: 'explosion' }]
-            }
+          <div class="border-t border-slate-800 pt-3">
+            <h3 class="text-xs font-semibold text-orange-400 mb-3">Brennbarkeit</h3>
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Brennbarkeit (0-100%)</label>
+                <input type="number" id="elemBurn" oninput="updateCurrentElement('burn', parseFloat(this.value))" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-2 text-sm text-slate-200 focus:border-blue-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Brennzeit (Ticks)</label>
+                <input type="number" id="elemBurnTime" oninput="updateCurrentElement('burnTime', parseFloat(this.value))" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-2 text-sm text-slate-200 focus:border-blue-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs text-slate-400 mb-1">Feuerfarbe</label>
+                <input type="color" id="elemFireColor" onchange="updateCurrentElement('fireColor', this.value)" class="w-full h-9 rounded bg-transparent cursor-pointer border border-slate-800">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: REACTIONS & EMISSION -->
+        <div id="tabReactions" class="space-y-4 hidden">
+          <!-- Emission Setup -->
+          <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold text-purple-400 flex items-center gap-1.5">
+                <i class="fa-solid fa-atom"></i> Partikel Emission (`emit`)
+              </label>
+              <input type="checkbox" id="elemEmitEnable" onchange="toggleEmission(this.checked)" class="rounded bg-slate-900 border-slate-700 text-blue-600 focus:ring-blue-500">
+            </div>
+            
+            <div id="emissionControls" class="grid grid-cols-2 gap-3 opacity-50 pointer-events-none">
+              <div>
+                <label class="block text-[11px] text-slate-400 mb-1">Emittiertes Element ID</label>
+                <input type="text" id="elemEmitId" oninput="updateCurrentElement('emit', this.value)" placeholder="z.B. smoke, light, radiation" class="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-200 font-mono">
+                <div class="flex flex-wrap gap-1 mt-1">
+                  <span onclick="setField('elemEmitId', 'smoke', 'emit')" class="cursor-pointer text-[10px] bg-slate-800 hover:bg-slate-700 px-1.5 py-0.5 rounded text-slate-300">smoke</span>
+                  <span onclick="setField('elemEmitId', 'spark', 'emit')" class="cursor-pointer text-[10px] bg-slate-800 hover:bg-slate-700 px-1.5 py-0.5 rounded text-slate-300">spark</span>
+                  <span onclick="setField('elemEmitId', 'fire', 'emit')" class="cursor-pointer text-[10px] bg-slate-800 hover:bg-slate-700 px-1.5 py-0.5 rounded text-slate-300">fire</span>
+                </div>
+              </div>
+              <div>
+                <label class="block text-[11px] text-slate-400 mb-1">Emissions-Chance (%)</label>
+                <input type="number" step="0.1" id="elemEmitChance" oninput="updateCurrentElement('emitChance', parseFloat(this.value))" placeholder="z.B. 5" class="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-200">
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Reactions List -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xs font-semibold text-slate-200">Reaktionsliste (`reactions`)</h3>
+              <button onclick="addReactionRow()" class="px-2.5 py-1 bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 text-xs rounded border border-blue-500/30 flex items-center gap-1">
+                <i class="fa-solid fa-plus text-[10px]"></i> Reaktion Hinzufügen
+              </button>
+            </div>
+            
+            <p class="text-[11px] text-slate-400 mb-3">
+              Definiere, wie dieses Element reagiert, wenn es mit anderen ID-Elementen in Kontakt kommt. Freie Identifier-Eingabe!
+            </p>
+
+            <div id="reactionsContainer" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+              <!-- Dynamically populated reactions -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: TICK CODE (JS OVERRIDE) -->
+        <div id="tabCode" class="space-y-3 hidden">
+          <label class="block text-xs text-slate-300 font-semibold">
+            Benutzerdefinierter JavaScript `tick()` Code (Optional)
+          </label>
+          <p class="text-xs text-slate-400">
+            Füge benutzerdefinierten Sandboxels JS-Code ein, der bei jedem Tick ausgeführt wird. Beispielsweise um Nachbarn zu verändern.
+          </p>
+          <textarea id="elemTickCode" oninput="updateCurrentElement('tick', this.value)" rows="6" placeholder="// Beispiel:\nif (pixel.temp > 100) {\n  createPixel('steam', pixel.x, pixel.y);\n}" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 font-mono text-xs text-emerald-400 focus:border-blue-500 focus:outline-none leading-relaxed"></textarea>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: Live Interactive Pixel Physics Simulator (Cols 4) -->
+    <section id="simulatorSection" class="lg:col-span-4 flex flex-col gap-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-xl flex flex-col h-full">
+        
+        <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-800">
+          <h2 class="font-semibold text-slate-200 flex items-center gap-2 text-sm">
+            <i class="fa-solid fa-gamepad text-emerald-400"></i> Sandboxels Physik Simulator
+          </h2>
+          <div class="flex items-center gap-1">
+            <button id="btnPauseSim" onclick="togglePauseSim()" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs">
+              <i class="fa-solid fa-pause"></i>
+            </button>
+            <button onclick="clearSimCanvas()" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs" title="Spielfeld Leeren">
+              <i class="fa-solid fa-rotate-left"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Canvas Container -->
+        <div class="relative aspect-square w-full bg-slate-950 rounded-lg overflow-hidden border border-slate-800 mb-3 flex items-center justify-center">
+          <canvas id="simCanvas" width="128" height="128" class="w-full h-full cursor-crosshair"></canvas>
+
+          <div class="absolute top-2 left-2 bg-slate-900/80 backdrop-blur px-2 py-1 rounded border border-slate-700 text-[10px] text-slate-300 font-mono">
+            FPS: <span id="fpsCounter" class="text-emerald-400">60</span> | Partikel: <span id="particleCount">0</span>
+          </div>
+        </div>
+
+        <!-- Simulator Tools Controls -->
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="block text-slate-400 mb-1 font-medium">Aktiver Pinsel / Element</label>
+            <select id="simBrushSelect" onchange="simState.selectedBrush = this.value" class="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-slate-200 font-mono focus:outline-none">
+              <!-- Populated by JS -->
+            </select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-slate-400 mb-1">Pinselgröße: <span id="brushSizeVal">3</span>px</label>
+              <input type="range" min="1" max="10" value="3" id="simBrushSize" oninput="simState.brushSize = parseInt(this.value); document.getElementById('brushSizeVal').innerText = this.value" class="w-full accent-blue-500">
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">Spezial-Pinsel</label>
+              <div class="flex gap-1">
+                <button onclick="setSpecialBrush('heat')" id="btnBrushHeat" class="flex-1 py-1 bg-slate-800 hover:bg-slate-700 text-orange-400 rounded text-[11px] font-semibold border border-slate-700">Hitze</button>
+                <button onclick="setSpecialBrush('cold')" id="btnBrushCold" class="flex-1 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-400 rounded text-[11px] font-semibold border border-slate-700">Kälte</button>
+                <button onclick="setSpecialBrush('eraser')" id="btnBrushEraser" class="flex-1 py-1 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded text-[11px] font-semibold border border-slate-700">Radierer</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Environment Preset Buttons -->
+          <div class="pt-2 border-t border-slate-800 flex flex-wrap gap-1.5">
+            <span class="text-[10px] text-slate-500 w-full mb-0.5">Schnell-Testumgebung:</span>
+            <button onclick="loadSimPreset('box')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Glas-Behälter</button>
+            <button onclick="loadSimPreset('lava_water')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px]">Lava + Wasser</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: Export Code Preview -->
+  <div id="exportModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-3xl w-full p-6 shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-code text-blue-400"></i> Sandboxels Mod JavaScript Export
+        </h3>
+        <button onclick="closeExportModal()" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="my-4 flex-1 overflow-hidden flex flex-col">
+        <p class="text-xs text-slate-400 mb-2">
+          Kopiere diesen Code direkt in deine Sandboxels-Konsole oder speichere ihn als `.js`-Datei, um ihn mit dem Sandboxels Mod Manager zu laden!
+        </p>
+        <textarea id="exportCodeTextarea" readonly class="w-full flex-1 bg-slate-950 border border-slate-800 rounded-lg p-4 font-mono text-xs text-emerald-400 focus:outline-none resize-none leading-relaxed overflow-y-auto"></textarea>
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-slate-800">
+        <button onclick="copyModCode()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg flex items-center gap-2 border border-slate-700 transition">
+          <i class="fa-solid fa-copy"></i> Code Kopieren
+        </button>
+        <div class="flex gap-2">
+          <button onclick="closeExportModal()" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg">Schließen</button>
+          <button onclick="downloadModFile()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg flex items-center gap-2 shadow-lg shadow-blue-600/30 transition">
+            <i class="fa-solid fa-download"></i> .js Datei Herunterladen
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ====================================================================
+       1. DATA STRUCTURES & DEFAULT PRESETS
+       ==================================================================== */
+    
+    // List of active custom elements created by user
+    let modElements = [
+      {
+        id: "super_lava",
+        name: "Super Lava",
+        color: "#ff3300",
+        category: "land",
+        state: "liquid",
+        density: 3000,
+        hardness: 0.8,
+        viscosity: 10,
+        conduct: 0.9,
+        tempHigh: 3000,
+        stateHigh: "fire",
+        tempLow: 800,
+        stateLow: "basalt",
+        burn: 0,
+        burnTime: 0,
+        fireColor: "#ffaa00",
+        emitEnable: true,
+        emit: "smoke",
+        emitChance: 3,
+        reactions: [
+          { reactWith: "water", product: "stone", chance: 80 },
+          { reactWith: "ice", product: "water", chance: 100 }
+        ],
+        tick: ""
+      },
+      {
+        id: "magic_powder",
+        name: "Magisches Pulver",
+        color: "#a855f7",
+        category: "fey",
+        state: "powder",
+        density: 1200,
+        hardness: 0.2,
+        viscosity: 0,
+        conduct: 0.5,
+        tempHigh: 500,
+        stateHigh: "spark",
+        tempLow: -50,
+        stateLow: "ice",
+        burn: 50,
+        burnTime: 20,
+        fireColor: "#c084fc",
+        emitEnable: false,
+        emit: "",
+        emitChance: 0,
+        reactions: [
+          { reactWith: "fire", product: "explosion", chance: 90 }
+        ],
+        tick: ""
+      }
+    ];
+
+    let activeElemIndex = 0;
+    let activeTab = 'basic';
+
+    /* ====================================================================
+       2. UI RENDER & ELEMENT MANAGEMENT FUNCTIONS
+       ==================================================================== */
+
+    function init() {
+      renderElementsList();
+      loadElementToEditor(0);
+      initSimulator();
+      updateSimBrushDropdown();
+    }
+
+    function renderElementsList() {
+      const container = document.getElementById('elementsList');
+      container.innerHTML = '';
+
+      document.getElementById('elementCount').innerText = modElements.length;
+
+      modElements.forEach((elem, idx) => {
+        const isSelected = idx === activeElemIndex;
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-lg border transition cursor-pointer flex items-center justify-between ${
+          isSelected 
+            ? 'bg-blue-950/40 border-blue-500/60 shadow-lg shadow-blue-950/30' 
+            : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+        }`;
+        card.onclick = () => selectElement(idx);
+
+        card.innerHTML = `
+          <div class="flex items-center gap-2.5 overflow-hidden">
+            <div class="w-4 h-4 rounded-full flex-shrink-0 border border-white/20" style="background-color: ${elem.color}"></div>
+            <div class="truncate">
+              <h4 class="text-xs font-semibold ${isSelected ? 'text-blue-300' : 'text-slate-200'} truncate">${elem.name || 'Unbenannt'}</h4>
+              <p class="text-[10px] font-mono text-slate-500 truncate">${elem.id}</p>
+            </div>
+          </div>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">${elem.state}</span>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function createNewElement() {
+      const newId = `custom_elem_${Date.now().toString().slice(-4)}`;
+      const newElem = {
+        id: newId,
+        name: "Neues Element",
+        color: "#3b82f6",
+        category: "powder",
+        state: "powder",
+        density: 1500,
+        hardness: 0.5,
+        viscosity: 0,
+        conduct: 0.1,
+        tempHigh: 1000,
+        stateHigh: "fire",
+        tempLow: 0,
+        stateLow: "ice",
+        burn: 0,
+        burnTime: 0,
+        fireColor: "#ffaa00",
+        emitEnable: false,
+        emit: "",
+        emitChance: 0,
+        reactions: [],
+        tick: ""
+      };
+
+      modElements.push(newElem);
+      renderElementsList();
+      selectElement(modElements.length - 1);
+      updateSimBrushDropdown();
+    }
+
+    function selectElement(index) {
+      if (index < 0 || index >= modElements.length) return;
+      activeElemIndex = index;
+      renderElementsList();
+      loadElementToEditor(index);
+    }
+
+    function duplicateCurrentElement() {
+      const current = modElements[activeElemIndex];
+      const clone = JSON.parse(JSON.stringify(current));
+      clone.id = `${clone.id}_copy`;
+      clone.name = `${clone.name} (Kopie)`;
+      modElements.push(clone);
+      renderElementsList();
+      selectElement(modElements.length - 1);
+      updateSimBrushDropdown();
+    }
+
+    function deleteCurrentElement() {
+      if (modElements.length <= 1) {
+        alert("Es muss mindestens ein Element im Mod verbleiben.");
+        return;
+      }
+      modElements.splice(activeElemIndex, 1);
+      activeElemIndex = Math.max(0, activeElemIndex - 1);
+      renderElementsList();
+      loadElementToEditor(activeElemIndex);
+      updateSimBrushDropdown();
+    }
+
+    /* ====================================================================
+       3. EDITOR BINDING & UPDATE LOGIC
+       ==================================================================== */
+
+    function loadElementToEditor(index) {
+      const elem = modElements[index];
+      if (!elem) return;
+
+      document.getElementById('activeElemTitle').innerText = elem.name || 'Unbenannt';
+      document.getElementById('activeElemIdText').innerText = `ID: ${elem.id}`;
+      document.getElementById('elemColorPicker').value = elem.color.startsWith('#') ? elem.color : '#ffffff';
+
+      // Basic Tab
+      document.getElementById('elemId').value = elem.id;
+      document.getElementById('elemName').value = elem.name;
+      document.getElementById('elemCategory').value = elem.category || 'land';
+      document.getElementById('elemState').value = elem.state || 'solid';
+      document.getElementById('elemColorText').value = elem.color;
+
+      // Physics Tab
+      document.getElementById('elemDensity').value = elem.density ?? 1000;
+      document.getElementById('elemHardness').value = elem.hardness ?? 0.5;
+      document.getElementById('elemViscosity').value = elem.viscosity ?? 0;
+      document.getElementById('elemConduct').value = elem.conduct ?? 0.1;
+      document.getElementById('elemTempHigh').value = elem.tempHigh ?? 1000;
+      document.getElementById('elemStateHigh').value = elem.stateHigh || '';
+      document.getElementById('elemTempLow').value = elem.tempLow ?? 0;
+      document.getElementById('elemStateLow').value = elem.stateLow || '';
+      document.getElementById('elemBurn').value = elem.burn ?? 0;
+      document.getElementById('elemBurnTime').value = elem.burnTime ?? 0;
+      document.getElementById('elemFireColor').value = elem.fireColor || '#ffaa00';
+
+      // Reactions & Emissions
+      document.getElementById('elemEmitEnable').checked = !!elem.emitEnable;
+      document.getElementById('elemEmitId').value = elem.emit || '';
+      document.getElementById('elemEmitChance').value = elem.emitChance ?? 0;
+      toggleEmission(!!elem.emitEnable);
+
+      renderReactionsList();
+
+      // Tick Code
+      document.getElementById('elemTickCode').value = elem.tick || '';
+    }
+
+    function updateCurrentElement(key, val) {
+      const elem = modElements[activeElemIndex];
+      if (!elem) return;
+
+      elem[key] = val;
+
+      if (key === 'name' || key === 'id' || key === 'color' || key === 'state') {
+        renderElementsList();
+        document.getElementById('activeElemTitle').innerText = elem.name || 'Unbenannt';
+        document.getElementById('activeElemIdText').innerText = `ID: ${elem.id}`;
+        if (key === 'color' && val.startsWith('#')) {
+          document.getElementById('elemColorPicker').value = val;
+        }
+        updateSimBrushDropdown();
+      }
+    }
+
+    function setField(fieldId, val, key) {
+      document.getElementById(fieldId).value = val;
+      updateCurrentElement(key, val);
+    }
+
+    function toggleEmission(enabled) {
+      const elem = modElements[activeElemIndex];
+      elem.emitEnable = enabled;
+      const controls = document.getElementById('emissionControls');
+      if (enabled) {
+        controls.classList.remove('opacity-50', 'pointer-events-none');
+      } else {
+        controls.classList.add('opacity-50', 'pointer-events-none');
+      }
+    }
+
+    function switchEditorTab(tab) {
+      activeTab = tab;
+      const tabs = ['basic', 'physics', 'reactions', 'code'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
+        const content = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+        
+        if (t === tab) {
+          btn.className = "py-2 px-3 border-b-2 border-blue-500 text-blue-400 font-semibold";
+          content.classList.remove('hidden');
+        } else {
+          btn.className = "py-2 px-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200";
+          content.classList.add('hidden');
+        }
+      });
+    }
+
+    /* ====================================================================
+       4. DYNAMIC REACTIONS LIST EDITOR
+       ==================================================================== */
+
+    function renderReactionsList() {
+      const elem = modElements[activeElemIndex];
+      const container = document.getElementById('reactionsContainer');
+      container.innerHTML = '';
+
+      if (!elem.reactions || elem.reactions.length === 0) {
+        container.innerHTML = `<p class="text-[11px] text-slate-500 italic p-2 bg-slate-950/40 rounded">Keine Reaktionen definiert.</p>`;
+        return;
+      }
+
+      elem.reactions.forEach((react, rIdx) => {
+        const row = document.createElement('div');
+        row.className = "bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex flex-wrap items-center gap-2 text-xs";
+
+        row.innerHTML = `
+          <div class="flex-1 min-w-[110px]">
+            <label class="block text-[10px] text-slate-500">Reagiert mit ID:</label>
+            <input type="text" value="${react.reactWith || ''}" oninput="updateReaction(${rIdx}, 'reactWith', this.value)" placeholder="z.B. water" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-slate-200 font-mono text-xs">
+          </div>
+          <div class="flex-1 min-w-[110px]">
+            <label class="block text-[10px] text-slate-500">Ergebnis ID:</label>
+            <input type="text" value="${react.product || ''}" oninput="updateReaction(${rIdx}, 'product', this.value)" placeholder="z.B. steam" class="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-slate-200 font-mono text-xs">
+          </div>
+          <div class="w-16">
+            <label class="block text-[10px] text-slate-500">Chance %:</label>
+            <input type="number" value="${react.chance ?? 100}" oninput="updateReaction(${rIdx}, 'chance', parseFloat(this.value))" class="w-full bg-slate-900 border border-slate-800 rounded px-1.5 py-1 text-slate-200 text-xs">
+          </div>
+          <button onclick="removeReactionRow(${rIdx})" class="mt-3 text-red-400 hover:text-red-300 p-1">
+            <i class="fa-solid fa-trash text-xs"></i>
+          </button>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function addReactionRow() {
+      const elem = modElements[activeElemIndex];
+      if (!elem.reactions) elem.reactions = [];
+      elem.reactions.push({ reactWith: "", product: "", chance: 100 });
+      renderReactionsList();
+    }
+
+    function updateReaction(rIdx, key, val) {
+      const elem = modElements[activeElemIndex];
+      if (elem.reactions && elem.reactions[rIdx]) {
+        elem.reactions[rIdx][key] = val;
+      }
+    }
+
+    function removeReactionRow(rIdx) {
+      const elem = modElements[activeElemIndex];
+      if (elem.reactions) {
+        elem.reactions.splice(rIdx, 1);
+        renderReactionsList();
+      }
+    }
+
+    /* ====================================================================
+       5. SANDBOXELS JS CODE EXPORTER
+       ==================================================================== */
+
+    function generateModJSCode() {
+      let code = `// =======================================================\n`;
+      code += `// Sandboxels Custom Mod - Generiert mit SB Mod Studio\n`;
+      code += `// Erstellt: ${new Date().toLocaleDateString('de-DE')}\n`;
+      code += `// =======================================================\n\n`;
+
+      modElements.forEach(elem => {
+        code += `elements.${elem.id} = {\n`;
+        code += `  color: "${elem.color}",\n`;
+        code += `  category: "${elem.category}",\n`;
+        code += `  state: "${elem.state}",\n`;
+        
+        // Map behavior constant based on state
+        let behaviorMap = {
+          solid: "behaviors.WALL",
+          powder: "behaviors.POWDER",
+          liquid: "behaviors.LIQUID",
+          denser_liquid: "behaviors.LIQUID",
+          gas: "behaviors.GAS",
+          energy: "behaviors.ENERGY",
+          wall: "behaviors.WALL",
+          immovable: "behaviors.WALL"
         };
+        code += `  behavior: ${behaviorMap[elem.state] || "behaviors.POWDER"},\n`;
 
-        function renderElementList() {
-            const container = document.getElementById('elementList');
-            container.innerHTML = '';
+        if (elem.density !== undefined) code += `  density: ${elem.density},\n`;
+        if (elem.hardness !== undefined) code += `  hardness: ${elem.hardness},\n`;
+        if (elem.viscosity !== undefined) code += `  viscosity: ${elem.viscosity},\n`;
+        if (elem.conduct !== undefined) code += `  conduct: ${elem.conduct},\n`;
 
-            elementsProject.forEach((elem, idx) => {
-                const isActive = idx === activeIndex;
-                const card = document.createElement('div');
-                card.className = `p-3 rounded-lg border transition cursor-pointer flex items-center justify-between gap-2 ${
-                    isActive 
-                        ? 'bg-pixelAccent/20 border-pixelAccent shadow-md' 
-                        : 'bg-pixelBg border-pixelBorder hover:bg-pixelCardHover'
-                }`;
-                card.onclick = () => selectElement(idx);
+        // Thermal properties
+        if (elem.tempHigh !== undefined) code += `  tempHigh: ${elem.tempHigh},\n`;
+        if (elem.stateHigh) code += `  stateHigh: "${elem.stateHigh}",\n`;
+        if (elem.tempLow !== undefined) code += `  tempLow: ${elem.tempLow},\n`;
+        if (elem.stateLow) code += `  stateLow: "${elem.stateLow}",\n`;
 
-                card.innerHTML = `
-                    <div class="flex items-center gap-2.5 overflow-hidden">
-                        <div class="w-4 h-4 rounded flex-shrink-0 border border-white/20" style="background-color: ${elem.color || '#fff'}"></div>
-                        <div class="truncate">
-                            <h4 class="text-xs font-bold ${isActive ? 'text-white' : 'text-gray-300'} truncate">${elem.name || 'Unbenannt'}</h4>
-                            <span class="text-[10px] text-gray-500 font-mono truncate block">${elem.id || 'no_id'}</span>
-                        </div>
-                    </div>
-                    <span class="text-[9px] px-1.5 py-0.5 rounded font-mono uppercase bg-pixelCard border border-pixelBorder ${
-                        elem.state === 'gas' ? 'text-yellow-400' : elem.state === 'liquid' ? 'text-cyan-400' : 'text-emerald-400'
-                    }">${elem.state}</span>
-                `;
-                container.appendChild(card);
-            });
-
-            document.getElementById('elementListBadge').textContent = `${elementsProject.length}/50`;
-            document.getElementById('projectCount').textContent = `${elementsProject.length} Elemente`;
-
-            // Update Dropdown pickers with fresh Custom elements
-            updateAllElementPickers();
+        // Burn properties
+        if (elem.burn > 0) {
+          code += `  burn: ${elem.burn},\n`;
+          code += `  burnTime: ${elem.burnTime},\n`;
+          code += `  fireColor: "${elem.fireColor}",\n`;
         }
 
-        function updateAllElementPickers() {
-            const pickers = document.querySelectorAll('.elem-picker');
-            
-            // Build unified options list: Standard + All Custom Elements
-            let optionsHTML = '';
+        // Emit properties
+        if (elem.emitEnable && elem.emit) {
+          code += `  emit: "${elem.emit}",\n`;
+          code += `  emitChance: ${elem.emitChance || 1},\n`;
+        }
 
-            optionsHTML += `<optgroup label="✨ Deine Custom Elemente">`;
-            elementsProject.forEach(el => {
-                optionsHTML += `<option value="${el.id}">⭐ ${el.name} (${el.id})</option>`;
-            });
-            optionsHTML += `</optgroup>`;
-
-            optionsHTML += `<optgroup label="📦 Standard Sandboxels">`;
-            standardElements.forEach(s => {
-                optionsHTML += `<option value="${s.id}">${s.name}</option>`;
-            });
-            optionsHTML += `</optgroup>`;
-
-            pickers.forEach(picker => {
-                const curVal = picker.value;
-                picker.innerHTML = optionsHTML;
-                if (curVal) picker.value = curVal;
-            });
-
-            // Simulator element selector update
-            const simSelect = document.getElementById('simElementSelect');
-            if (simSelect) {
-                const curSimVal = simSelect.value;
-                simSelect.innerHTML = optionsHTML;
-                if (curSimVal) simSelect.value = curSimVal;
+        // Dynamic Reactions
+        if (elem.reactions && elem.reactions.length > 0) {
+          code += `  reactions: {\n`;
+          elem.reactions.forEach(r => {
+            if (r.reactWith && r.product) {
+              code += `    "${r.reactWith}": { elem1: "${r.product}", chance: ${(r.chance / 100).toFixed(2)} },\n`;
             }
+          });
+          code += `  },\n`;
         }
 
-        function selectElement(index) {
-            if (index < 0 || index >= elementsProject.length) return;
-            activeIndex = index;
-            renderElementList();
-            loadActiveElementToForm();
+        // Custom Tick Code
+        if (elem.tick && elem.tick.trim().length > 0) {
+          code += `  tick: function(pixel) {\n`;
+          code += `    ${elem.tick.replace(/\n/g, '\n    ')}\n`;
+          code += `  }\n`;
         }
 
-        function loadActiveElementToForm() {
-            const elem = elementsProject[activeIndex];
-            if (!elem) return;
+        code += `};\n\n`;
+      });
 
-            document.getElementById('activeElemTitle').textContent = elem.name || 'Unbenannt';
-            document.getElementById('activeElemColorBadge').style.backgroundColor = elem.color || '#ffffff';
+      return code;
+    }
 
-            document.getElementById('propName').value = elem.name || '';
-            document.getElementById('propId').value = elem.id || '';
-            document.getElementById('propCategory').value = elem.category || 'land';
-            document.getElementById('propColor').value = elem.color || '#ffffff';
-            document.getElementById('propColorText').value = elem.color || '#ffffff';
-            document.getElementById('propDesc').value = elem.desc || '';
+    function openExportModal() {
+      const code = generateModJSCode();
+      document.getElementById('exportCodeTextarea').value = code;
+      document.getElementById('exportModal').classList.remove('hidden');
+    }
 
-            document.getElementById('propState').value = elem.state || 'solid';
-            document.getElementById('propDensity').value = elem.density ?? 1000;
-            document.getElementById('propViscosity').value = elem.viscosity ?? 1;
+    function closeExportModal() {
+      document.getElementById('exportModal').classList.add('hidden');
+    }
 
-            document.getElementById('propHighTemp').value = elem.highTemp ?? '';
-            document.getElementById('propStateHigh').value = elem.stateHigh || '';
-            document.getElementById('propLowTemp').value = elem.lowTemp ?? '';
-            document.getElementById('propStateLow').value = elem.stateLow || '';
+    function copyModCode() {
+      const textarea = document.getElementById('exportCodeTextarea');
+      textarea.select();
+      document.execCommand('copy');
+      alert("Mod-Code erfolgreich in die Zwischenablage kopiert!");
+    }
 
-            document.getElementById('propBurn').value = elem.burn ?? 0;
-            document.getElementById('propBurnTime').value = elem.burnTime ?? 0;
-            document.getElementById('propBurnTemp').value = elem.burnTemp ?? 0;
-            document.getElementById('propBurnInto').value = elem.burnInto || '';
-            document.getElementById('propExplosionType').value = elem.explosionType || '';
+    function downloadModFile() {
+      const code = generateModJSCode();
+      const blob = new Blob([code], { type: 'text/javascript' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sandboxels_custom_mod.js`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
 
-            document.getElementById('propEmit').value = elem.emit || '';
-            document.getElementById('propEmitChance').value = elem.emitChance ?? 0;
-            document.getElementById('propEmitNum').value = elem.emitNum ?? 1;
+    /* ====================================================================
+       6. INTERACTIVE PIXEL PHYSICS CANVAS SIMULATOR
+       ==================================================================== */
 
-            document.getElementById('propHardness').value = elem.hardness ?? 0;
-            document.getElementById('propConduct').value = elem.conduct ?? 0;
-            document.getElementById('propStain').value = elem.stain ?? 0;
-            document.getElementById('propHidden').checked = !!elem.hidden;
-            document.getElementById('propTickCode').value = elem.tickCode || '';
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = 128;
+    const height = 128;
 
-            renderReactionsContainer();
-            generateFullModCode();
+    // Simulation Grid & Particles
+    let grid = new Array(width * height).fill(null);
+    let simPaused = false;
+
+    let simState = {
+      selectedBrush: 'super_lava',
+      brushSize: 3,
+      isMouseDown: false,
+      specialBrush: null // 'heat', 'cold', 'eraser'
+    };
+
+    // Standard built-in elements for simulator interactions
+    const builtInElements = {
+      water: { name: 'Wasser', color: '#3b82f6', state: 'liquid', density: 1000 },
+      stone: { name: 'Stein', color: '#64748b', state: 'wall', density: 2500 },
+      ice: { name: 'Eis', color: '#93c5fd', state: 'wall', density: 900 },
+      lava: { name: 'Lava', color: '#f97316', state: 'liquid', density: 2800 },
+      fire: { name: 'Feuer', color: '#ef4444', state: 'energy', density: 1 },
+      smoke: { name: 'Rauch', color: '#94a3b8', state: 'gas', density: 2 },
+      steam: { name: 'Dampf', color: '#cbd5e1', state: 'gas', density: 3 }
+    };
+
+    function initSimulator() {
+      // Event Listeners for Drawing
+      canvas.addEventListener('mousedown', (e) => {
+        simState.isMouseDown = true;
+        drawBrush(e);
+      });
+      canvas.addEventListener('mousemove', (e) => {
+        if (simState.isMouseDown) drawBrush(e);
+      });
+      window.addEventListener('mouseup', () => simState.isMouseDown = false);
+
+      // Touch Controls
+      canvas.addEventListener('touchstart', (e) => {
+        simState.isMouseDown = true;
+        drawBrush(e.touches[0]);
+      });
+      canvas.addEventListener('touchmove', (e) => {
+        if (simState.isMouseDown) drawBrush(e.touches[0]);
+      });
+      canvas.addEventListener('touchend', () => simState.isMouseDown = false);
+
+      // Animation Loop
+      requestAnimationFrame(stepSim);
+    }
+
+    function updateSimBrushDropdown() {
+      const select = document.getElementById('simBrushSelect');
+      select.innerHTML = '';
+
+      // User Elements group
+      const customGroup = document.createElement('optgroup');
+      customGroup.label = "Eigene Mod Elemente";
+      modElements.forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e.id;
+        opt.innerText = `${e.name} (${e.id})`;
+        customGroup.appendChild(opt);
+      });
+      select.appendChild(customGroup);
+
+      // Built-in group
+      const builtinGroup = document.createElement('optgroup');
+      builtinGroup.label = "Standard Elemente";
+      Object.keys(builtInElements).forEach(key => {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.innerText = builtInElements[key].name;
+        builtinGroup.appendChild(opt);
+      });
+      select.appendChild(builtinGroup);
+
+      if (modElements.length > 0) {
+        simState.selectedBrush = modElements[0].id;
+        select.value = modElements[0].id;
+      }
+    }
+
+    function setSpecialBrush(type) {
+      simState.specialBrush = simState.specialBrush === type ? null : type;
+      ['Heat', 'Cold', 'Eraser'].forEach(b => {
+        const btn = document.getElementById(`btnBrush${b}`);
+        if (b.toLowerCase() === simState.specialBrush) {
+          btn.classList.add('ring-2', 'ring-blue-400', 'bg-slate-700');
+        } else {
+          btn.classList.remove('ring-2', 'ring-blue-400', 'bg-slate-700');
         }
+      });
+    }
 
-        function updateActiveElementFromForm() {
-            const elem = elementsProject[activeIndex];
-            if (!elem) return;
+    function drawBrush(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = width / rect.width;
+      const scaleY = height / rect.height;
+      
+      const cx = Math.floor((e.clientX - rect.left) * scaleX);
+      const cy = Math.floor((e.clientY - rect.top) * scaleY);
 
-            elem.name = document.getElementById('propName').value;
-            elem.id = document.getElementById('propId').value.toLowerCase().replace(/\s+/g, '_');
-            elem.category = document.getElementById('propCategory').value;
-            elem.color = document.getElementById('propColorText').value;
-            elem.desc = document.getElementById('propDesc').value;
+      const radius = simState.brushSize;
 
-            elem.state = document.getElementById('propState').value;
-            elem.density = parseFloat(document.getElementById('propDensity').value) || 0;
-            elem.viscosity = parseFloat(document.getElementById('propViscosity').value) || 1;
+      for (let dy = -radius; dy <= radius; dy++) {
+        for (let dx = -radius; dx <= radius; dx++) {
+          if (dx * dx + dy * dy <= radius * radius) {
+            const x = cx + dx;
+            const y = cy + dy;
+            if (x >= 0 && x < width && y >= 0 && y < height) {
+              const idx = y * width + x;
 
-            elem.highTemp = document.getElementById('propHighTemp').value;
-            elem.stateHigh = document.getElementById('propStateHigh').value;
-            elem.lowTemp = document.getElementById('propLowTemp').value;
-            elem.stateLow = document.getElementById('propStateLow').value;
-
-            elem.burn = parseFloat(document.getElementById('propBurn').value) || 0;
-            elem.burnTime = parseFloat(document.getElementById('propBurnTime').value) || 0;
-            elem.burnTemp = parseFloat(document.getElementById('propBurnTemp').value) || 0;
-            elem.burnInto = document.getElementById('propBurnInto').value;
-            elem.explosionType = document.getElementById('propExplosionType').value;
-
-            elem.emit = document.getElementById('propEmit').value;
-            elem.emitChance = parseFloat(document.getElementById('propEmitChance').value) || 0;
-            elem.emitNum = parseInt(document.getElementById('propEmitNum').value) || 1;
-
-            elem.hardness = parseFloat(document.getElementById('propHardness').value) || 0;
-            elem.conduct = parseFloat(document.getElementById('propConduct').value) || 0;
-            elem.stain = parseFloat(document.getElementById('propStain').value) || 0;
-            elem.hidden = document.getElementById('propHidden').checked;
-            elem.tickCode = document.getElementById('propTickCode').value;
-
-            // Header preview sync
-            document.getElementById('activeElemTitle').textContent = elem.name || 'Unbenannt';
-            document.getElementById('activeElemColorBadge').style.backgroundColor = elem.color || '#ffffff';
-
-            renderElementList();
-            generateFullModCode();
-        }
-
-        function renderReactionsContainer() {
-            const container = document.getElementById('reactionsContainer');
-            container.innerHTML = '';
-            const elem = elementsProject[activeIndex];
-            if (!elem || !elem.reactions) return;
-
-            elem.reactions.forEach((r, rIdx) => {
-                const div = document.createElement('div');
-                div.className = "flex items-center gap-2 bg-pixelBg p-2 rounded-lg border border-pixelBorder";
-                
-                div.innerHTML = `
-                    <span class="text-xs text-gray-400">Trifft</span>
-                    <select onchange="elementsProject[${activeIndex}].reactions[${rIdx}].target = this.value; updateActiveElementFromForm();" class="elem-picker flex-1 bg-pixelCard border border-pixelBorder rounded px-2 py-1 text-xs text-white focus:outline-none custom-select-dark">
-                        <!-- Populated -->
-                    </select>
-                    <span class="text-xs text-gray-400">➜</span>
-                    <select onchange="elementsProject[${activeIndex}].reactions[${rIdx}].result = this.value; updateActiveElementFromForm();" class="elem-picker flex-1 bg-pixelCard border border-pixelBorder rounded px-2 py-1 text-xs text-white focus:outline-none custom-select-dark">
-                        <!-- Populated -->
-                    </select>
-                    <button onclick="removeReactionRow(${rIdx})" class="text-red-400 hover:text-red-300 px-1.5 py-0.5"><i class="fa-solid fa-xmark"></i></button>
-                `;
-                container.appendChild(div);
-            });
-
-            updateAllElementPickers();
-
-            // Set current values
-            const rows = container.querySelectorAll('div');
-            elem.reactions.forEach((r, rIdx) => {
-                if (rows[rIdx]) {
-                    const selects = rows[rIdx].querySelectorAll('select');
-                    if (selects[0]) selects[0].value = r.target;
-                    if (selects[1]) selects[1].value = r.result;
-                }
-            });
-        }
-
-        function addReactionRow() {
-            const elem = elementsProject[activeIndex];
-            if (!elem.reactions) elem.reactions = [];
-            elem.reactions.push({ target: 'water', result: 'steam' });
-            renderReactionsContainer();
-            updateActiveElementFromForm();
-        }
-
-        function removeReactionRow(rIdx) {
-            const elem = elementsProject[activeIndex];
-            if (elem && elem.reactions) {
-                elem.reactions.splice(rIdx, 1);
-                renderReactionsContainer();
-                updateActiveElementFromForm();
+              if (simState.specialBrush === 'eraser') {
+                grid[idx] = null;
+              } else if (simState.specialBrush === 'heat') {
+                if (grid[idx]) grid[idx].temp = (grid[idx].temp || 20) + 150;
+              } else if (simState.specialBrush === 'cold') {
+                if (grid[idx]) grid[idx].temp = (grid[idx].temp || 20) - 100;
+              } else {
+                createParticleAt(x, y, simState.selectedBrush);
+              }
             }
+          }
         }
+      }
+    }
 
-        function createNewElement() {
-            const count = elementsProject.length + 1;
-            const newElem = {
-                id: `custom_element_${count}`,
-                name: `Neues Element ${count}`,
-                category: 'land',
-                color: '#3b82f6',
-                desc: 'Ein neu erstelltes Sandboxels Element.',
-                state: 'solid',
-                density: 1000,
-                viscosity: 1,
-                highTemp: '',
-                stateHigh: '',
-                lowTemp: '',
-                stateLow: '',
-                burn: 0,
-                burnTime: 0,
-                burnTemp: 0,
-                burnInto: '',
-                explosionType: '',
-                emit: '',
-                emitChance: 0,
-                emitNum: 1,
-                hardness: 0.5,
-                conduct: 0,
-                stain: 0,
-                hidden: false,
-                tickCode: '',
-                reactions: []
-            };
-            elementsProject.push(newElem);
-            selectElement(elementsProject.length - 1);
-        }
+    function createParticleAt(x, y, elemId) {
+      const idx = y * width + x;
+      
+      // Look up in custom mod elements or built-in elements
+      let def = modElements.find(e => e.id === elemId) || builtInElements[elemId];
+      if (!def) {
+        def = { color: '#ffffff', state: 'powder', density: 1000 };
+      }
 
-        function duplicateActiveElement() {
-            const current = elementsProject[activeIndex];
-            if (!current) return;
-            const clone = JSON.parse(JSON.stringify(current));
-            clone.id = `${clone.id}_copy`;
-            clone.name = `${clone.name} (Kopie)`;
-            elementsProject.push(clone);
-            selectElement(elementsProject.length - 1);
-        }
+      grid[idx] = {
+        id: elemId,
+        color: def.color,
+        state: def.state || 'powder',
+        density: def.density ?? 1000,
+        temp: 20,
+        life: 0
+      };
+    }
 
-        function deleteActiveElement() {
-            if (elementsProject.length <= 1) {
-                alert('Ein Mod muss mindestens 1 Element enthalten!');
-                return;
+    function clearSimCanvas() {
+      grid.fill(null);
+    }
+
+    function togglePauseSim() {
+      simPaused = !simPaused;
+      const btn = document.getElementById('btnPauseSim');
+      btn.innerHTML = simPaused ? '<i class="fa-solid fa-play"></i>' : '<i class="fa-solid fa-pause"></i>';
+    }
+
+    // PHYSICS & REACTION SIMULATION TICK ENGINE
+    let lastTime = performance.now();
+    let frameCount = 0;
+
+    function stepSim(now) {
+      frameCount++;
+      if (now - lastTime >= 1000) {
+        document.getElementById('fpsCounter').innerText = frameCount;
+        frameCount = 0;
+        lastTime = now;
+      }
+
+      if (!simPaused) {
+        updatePhysics();
+      }
+
+      renderCanvas();
+      requestAnimationFrame(stepSim);
+    }
+
+    function updatePhysics() {
+      let particleCount = 0;
+
+      // Bottom to top loop for falling physics
+      for (let y = height - 1; y >= 0; y--) {
+        for (let x = 0; x < width; x++) {
+          const idx = y * width + x;
+          const p = grid[idx];
+          if (!p) continue;
+
+          particleCount++;
+          p.life++;
+
+          // Check custom definition for thermal state changes & emissions
+          const def = modElements.find(e => e.id === p.id);
+
+          if (def) {
+            // Thermal state high
+            if (def.tempHigh !== undefined && p.temp >= def.tempHigh && def.stateHigh) {
+              createParticleAt(x, y, def.stateHigh);
+              continue;
             }
-            elementsProject.splice(activeIndex, 1);
-            activeIndex = Math.max(0, activeIndex - 1);
-            selectElement(activeIndex);
-        }
-
-        function applyTemplateToNew(type) {
-            if (!type || !templates[type]) return;
-            const t = templates[type];
-            const newElem = JSON.parse(JSON.stringify(t));
-            // Ensure unique ID
-            newElem.id = `${newElem.id}_${Date.now().toString().slice(-4)}`;
-            elementsProject.push(newElem);
-            document.getElementById('templateSelect').value = '';
-            selectElement(elementsProject.length - 1);
-        }
-
-        function generateFullModCode() {
-            let js = `// ========================================================\n`;
-            js += `// SANDBOXELS MULTI-ELEMENT MOD\n`;
-            js += `// Generiert mit Sandboxels Multi-Element Mod Creator\n`;
-            js += `// Anzahl Elemente: ${elementsProject.length}\n`;
-            js += `// ========================================================\n\n`;
-
-            elementsProject.forEach(elem => {
-                const id = elem.id || 'unnamed_element';
-                js += `// --- Element: ${elem.name} (${id}) ---\n`;
-                js += `elements["${id}"] = {\n`;
-                js += `    color: "${elem.color || '#ffffff'}",\n`;
-                js += `    category: "${elem.category || 'special'}",\n`;
-                js += `    state: "${elem.state || 'solid'}",\n`;
-                js += `    density: ${elem.density ?? 1000},\n`;
-
-                if (elem.desc) js += `    desc: "${elem.desc.replace(/"/g, '\\"')}",\n`;
-                if (elem.state === 'liquid') js += `    viscosity: ${elem.viscosity ?? 1},\n`;
-
-                if (elem.highTemp !== "" && elem.highTemp !== undefined) js += `    highTemp: ${elem.highTemp},\n`;
-                if (elem.stateHigh) js += `    stateHigh: "${elem.stateHigh}",\n`;
-                if (elem.lowTemp !== "" && elem.lowTemp !== undefined) js += `    lowTemp: ${elem.lowTemp},\n`;
-                if (elem.stateLow) js += `    stateLow: "${elem.stateLow}",\n`;
-
-                if (elem.burn > 0) {
-                    js += `    burn: ${elem.burn},\n`;
-                    js += `    burnTime: ${elem.burnTime},\n`;
-                    js += `    burnTemp: ${elem.burnTemp},\n`;
-                    if (elem.burnInto) js += `    burnInto: "${elem.burnInto}",\n`;
-                }
-
-                if (elem.explosionType) {
-                    if (!isNaN(elem.explosionType)) {
-                        js += `    explosionType: ${elem.explosionType},\n`;
-                    } else {
-                        js += `    explosionType: "${elem.explosionType}",\n`;
-                    }
-                }
-
-                if (elem.emit) {
-                    js += `    emit: "${elem.emit}",\n`;
-                    js += `    emitChance: ${elem.emitChance},\n`;
-                    js += `    emitNum: ${elem.emitNum},\n`;
-                }
-
-                if (elem.hardness > 0) js += `    hardness: ${elem.hardness},\n`;
-                if (elem.conduct > 0) js += `    conduct: ${elem.conduct},\n`;
-                if (elem.stain > 0) js += `    stain: ${elem.stain},\n`;
-                if (elem.hidden) js += `    hidden: true,\n`;
-
-                // Reactions
-                if (elem.reactions && elem.reactions.length > 0) {
-                    js += `    reactions: {\n`;
-                    elem.reactions.forEach(r => {
-                        if (r.target && r.result) {
-                            js += `        "${r.target}": { elem2: "${r.result}" },\n`;
-                        }
-                    });
-                    js += `    },\n`;
-                }
-
-                // Custom Tick Function
-                if (elem.tickCode && elem.tickCode.trim()) {
-                    js += `    tick: function(pixel) {\n`;
-                    js += `        ${elem.tickCode.trim().replace(/\n/g, '\n        ')}\n`;
-                    js += `    }\n`;
-                }
-
-                js += `};\n\n`;
-            });
-
-            document.getElementById('codeOutput').textContent = js;
-        }
-
-        function copyCode() {
-            const code = document.getElementById('codeOutput').textContent;
-            const textarea = document.createElement('textarea');
-            textarea.value = code;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            alert('Gesamter Mod-Code in die Zwischenablage kopiert!');
-        }
-
-        function downloadCode() {
-            const code = document.getElementById('codeOutput').textContent;
-            const blob = new Blob([code], { type: 'text/javascript' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `sandboxels_multi_mod.js`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active', 'bg-pixelAccent', 'text-white');
-                btn.classList.add('bg-pixelBg', 'text-gray-400');
-            });
-
-            document.getElementById('section-' + tabId).classList.remove('hidden');
-            const activeBtn = document.getElementById('tab-' + tabId);
-            activeBtn.classList.add('active', 'bg-pixelAccent', 'text-white');
-            activeBtn.classList.remove('bg-pixelBg', 'text-gray-400');
-        }
-
-        function syncColorInput(val) {
-            document.getElementById('propColorText').value = val;
-            updateActiveElementFromForm();
-        }
-
-        function syncColorPicker(val) {
-            if (/^#[0-9A-F]{6}$/i.test(val)) {
-                document.getElementById('propColor').value = val;
+            // Thermal state low
+            if (def.tempLow !== undefined && p.temp <= def.tempLow && def.stateLow) {
+              createParticleAt(x, y, def.stateLow);
+              continue;
             }
-            updateActiveElementFromForm();
-        }
-
-        const canvas = document.getElementById('simCanvas');
-        const ctx = canvas.getContext('2d');
-        const GRID_SIZE = 128;
-        let grid = new Array(GRID_SIZE * GRID_SIZE).fill(null);
-
-        function toggleSimPause() {
-            simPaused = !simPaused;
-            const btn = document.getElementById('simPauseBtn');
-            btn.innerHTML = simPaused ? '<i class="fa-solid fa-play text-sbGreen"></i>' : '<i class="fa-solid fa-pause"></i>';
-        }
-
-        function setSimTool(tool) {
-            currentSimTool = tool;
-            document.querySelectorAll('.sim-tool-btn').forEach(b => {
-                b.classList.remove('active', 'bg-pixelAccent', 'text-white');
-                b.classList.add('bg-pixelBg', 'text-gray-300');
-            });
-            const active = document.getElementById('tool-' + tool);
-            active.classList.add('active', 'bg-pixelAccent', 'text-white');
-            active.classList.remove('bg-pixelBg', 'text-gray-300');
-        }
-
-        function clearSimCanvas() {
-            grid.fill(null);
-        }
-
-        let isDrawing = false;
-        function getCanvasCoords(e) {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            const x = Math.floor((e.clientX - rect.left) * scaleX);
-            const y = Math.floor((e.clientY - rect.top) * scaleY);
-            return { x: Math.max(0, Math.min(GRID_SIZE - 1, x)), y: Math.max(0, Math.min(GRID_SIZE - 1, y)) };
-        }
-
-        function placeParticle(x, y) {
-            const simElemId = document.getElementById('simElementSelect').value;
-            const brushSize = 2;
-
-            // Find config matching selected element
-            let customCfg = elementsProject.find(e => e.id === simElemId);
-            let color = customCfg ? customCfg.color : '#3b82f6';
-            let state = customCfg ? customCfg.state : 'solid';
-
-            if (simElemId === 'water') { color = '#3b82f6'; state = 'liquid'; }
-            if (simElemId === 'fire') { color = '#ef4444'; state = 'gas'; }
-            if (simElemId === 'sand') { color = '#eab308'; state = 'solid'; }
-
-            for (let dx = -brushSize; dx <= brushSize; dx++) {
-                for (let dy = -brushSize; dy <= brushSize; dy++) {
-                    const nx = x + dx;
-                    const ny = y + dy;
-                    if (nx >= 0 && nx < GRID_SIZE && ny >= 0 && ny < GRID_SIZE) {
-                        const idx = ny * GRID_SIZE + nx;
-                        if (currentSimTool === 'draw') {
-                            grid[idx] = {
-                                type: simElemId,
-                                color: color,
-                                state: state,
-                                temp: 20
-                            };
-                        } else if (currentSimTool === 'wall') {
-                            grid[idx] = { type: 'wall', color: '#64748b', state: 'solid', temp: 20 };
-                        } else if (currentSimTool === 'eraser') {
-                            grid[idx] = null;
-                        } else if (currentSimTool === 'heat') {
-                            if (grid[idx]) grid[idx].temp += 100;
-                        }
-                    }
-                }
+            // Emission
+            if (def.emitEnable && def.emit && Math.random() * 100 < (def.emitChance || 5)) {
+              const ny = y - 1;
+              if (ny >= 0 && !grid[ny * width + x]) {
+                createParticleAt(x, ny, def.emit);
+              }
             }
-        }
+          }
 
-        canvas.addEventListener('mousedown', (e) => { isDrawing = true; placeParticle(...Object.values(getCanvasCoords(e))); });
-        canvas.addEventListener('mousemove', (e) => { 
-            const {x, y} = getCanvasCoords(e);
-            const p = grid[y * GRID_SIZE + x];
-            document.getElementById('simInfo').textContent = `X: ${x} Y: ${y} | ${p ? p.type + ' (' + Math.round(p.temp) + '°C)' : 'Leer'}`;
-            if (isDrawing) placeParticle(x, y); 
-        });
-        window.addEventListener('mouseup', () => isDrawing = false);
+          // Reactions with neighbors
+          const neighbors = [
+            { x: x + 1, y: y }, { x: x - 1, y: y },
+            { x: x, y: y + 1 }, { x: x, y: y - 1 }
+          ];
 
-        function updatePhysics() {
-            if (simPaused) return;
-
-            const nextGrid = [...grid];
-
-            for (let y = GRID_SIZE - 1; y >= 0; y--) {
-                for (let x = 0; x < GRID_SIZE; x++) {
-                    const idx = y * GRID_SIZE + x;
-                    const p = grid[idx];
-                    if (!p || p.type === 'wall') continue;
-
-                    // Custom Element Config lookup
-                    const cfg = elementsProject.find(e => e.id === p.type);
-
-                    if (cfg) {
-                        // High Temp Melting Change
-                        if (cfg.highTemp !== "" && p.temp >= parseFloat(cfg.highTemp) && cfg.stateHigh) {
-                            const targetCfg = elementsProject.find(e => e.id === cfg.stateHigh);
-                            grid[idx] = { 
-                                type: cfg.stateHigh, 
-                                color: targetCfg ? targetCfg.color : '#ff5500', 
-                                state: targetCfg ? targetCfg.state : 'liquid', 
-                                temp: p.temp 
-                            };
-                            continue;
-                        }
-
-                        // Emission Logic
-                        if (cfg.emit && Math.random() * 100 < cfg.emitChance) {
-                            const emX = x + Math.floor(Math.random() * 3) - 1;
-                            const emY = y + Math.floor(Math.random() * 3) - 1;
-                            if (emX >= 0 && emX < GRID_SIZE && emY >= 0 && emY < GRID_SIZE) {
-                                const emIdx = emY * GRID_SIZE + emX;
-                                if (!grid[emIdx]) {
-                                    const emitCfg = elementsProject.find(e => e.id === cfg.emit);
-                                    nextGrid[emIdx] = { 
-                                        type: cfg.emit, 
-                                        color: emitCfg ? emitCfg.color : '#a855f7', 
-                                        state: emitCfg ? emitCfg.state : 'gas', 
-                                        temp: p.temp 
-                                    };
-                                }
-                            }
-                        }
-                    }
-
-                    // Movement Logic based on State
-                    if (p.state === 'solid') continue;
-
-                    if (p.state === 'liquid') {
-                        // Down
-                        const below = (y + 1) * GRID_SIZE + x;
-                        if (y < GRID_SIZE - 1 && !nextGrid[below]) {
-                            nextGrid[below] = p;
-                            nextGrid[idx] = null;
-                        } else if (y < GRID_SIZE - 1) {
-                            // Sideways flow
-                            const dir = Math.random() < 0.5 ? -1 : 1;
-                            const side = y * GRID_SIZE + (x + dir);
-                            if (x + dir >= 0 && x + dir < GRID_SIZE && !nextGrid[side]) {
-                                nextGrid[side] = p;
-                                nextGrid[idx] = null;
-                            }
-                        }
-                    } else if (p.state === 'gas') {
-                        // Rise Up
-                        const above = (y - 1) * GRID_SIZE + x;
-                        if (y > 0 && !nextGrid[above]) {
-                            nextGrid[above] = p;
-                            nextGrid[idx] = null;
-                        } else {
-                            // Spread sideways
-                            const dir = Math.random() < 0.5 ? -1 : 1;
-                            const side = y * GRID_SIZE + (x + dir);
-                            if (x + dir >= 0 && x + dir < GRID_SIZE && !nextGrid[side]) {
-                                nextGrid[side] = p;
-                                nextGrid[idx] = null;
-                            }
-                        }
-                    }
-                }
+          for (let n of neighbors) {
+            if (n.x >= 0 && n.x < width && n.y >= 0 && n.y < height) {
+              const nIdx = n.y * width + n.x;
+              const neighbor = grid[nIdx];
+              if (neighbor && def && def.reactions) {
+                def.reactions.forEach(r => {
+                  if (r.reactWith === neighbor.id && Math.random() * 100 <= (r.chance || 100)) {
+                    createParticleAt(x, y, r.product);
+                  }
+                });
+              }
             }
+          }
 
-            grid = nextGrid;
-        }
-
-        function renderSim() {
-            ctx.fillStyle = '#09090b';
-            ctx.fillRect(0, 0, GRID_SIZE, GRID_SIZE);
-
-            const imgData = ctx.getImageData(0, 0, GRID_SIZE, GRID_SIZE);
-            const pixels = imgData.data;
-
-            for (let i = 0; i < grid.length; i++) {
-                const p = grid[i];
-                if (p) {
-                    const pIdx = i * 4;
-                    let hex = p.color || '#ffffff';
-                    if (hex.startsWith('#')) {
-                        const r = parseInt(hex.slice(1, 3), 16);
-                        const g = parseInt(hex.slice(3, 5), 16);
-                        const b = parseInt(hex.slice(5, 7), 16);
-                        pixels[pIdx] = r;
-                        pixels[pIdx + 1] = g;
-                        pixels[pIdx + 2] = b;
-                        pixels[pIdx + 3] = 255;
-                    }
+          // Movement Behavior Physics
+          if (p.state === 'powder') {
+            if (y + 1 < height) {
+              if (!grid[(y + 1) * width + x]) {
+                swapPixels(x, y, x, y + 1);
+              } else {
+                const dir = Math.random() < 0.5 ? -1 : 1;
+                if (x + dir >= 0 && x + dir < width && !grid[(y + 1) * width + (x + dir)]) {
+                  swapPixels(x, y, x + dir, y + 1);
                 }
+              }
             }
-
-            ctx.putImageData(imgData, 0, 0);
+          } else if (p.state === 'liquid' || p.state === 'denser_liquid') {
+            if (y + 1 < height && !grid[(y + 1) * width + x]) {
+              swapPixels(x, y, x, y + 1);
+            } else {
+              const dir = Math.random() < 0.5 ? -1 : 1;
+              if (x + dir >= 0 && x + dir < width && !grid[y * width + (x + dir)]) {
+                swapPixels(x, y, x + dir, y);
+              }
+            }
+          } else if (p.state === 'gas') {
+            if (y - 1 >= 0) {
+              if (!grid[(y - 1) * width + x]) {
+                swapPixels(x, y, x, y - 1);
+              } else {
+                const dir = Math.random() < 0.5 ? -1 : 1;
+                if (x + dir >= 0 && x + dir < width && !grid[(y - 1) * width + (x + dir)]) {
+                  swapPixels(x, y, x + dir, y - 1);
+                }
+              }
+            }
+            // Disperse gas after life
+            if (p.life > 150 && Math.random() < 0.05) {
+              grid[idx] = null;
+            }
+          } else if (p.state === 'energy') {
+            if (p.life > 30) grid[idx] = null;
+          }
         }
+      }
 
-        function simGameLoop() {
-            updatePhysics();
-            renderSim();
-            requestAnimationFrame(simGameLoop);
+      document.getElementById('particleCount').innerText = particleCount;
+    }
+
+    function swapPixels(x1, y1, x2, y2) {
+      const idx1 = y1 * width + x1;
+      const idx2 = y2 * width + x2;
+      const temp = grid[idx1];
+      grid[idx1] = grid[idx2];
+      grid[idx2] = temp;
+    }
+
+    function renderCanvas() {
+      ctx.fillStyle = '#090d16';
+      ctx.fillRect(0, 0, width, height);
+
+      const imgData = ctx.createImageData(width, height);
+      const data = imgData.data;
+
+      for (let i = 0; i < grid.length; i++) {
+        const p = grid[i];
+        if (p) {
+          const pixelIdx = i * 4;
+          const rgb = hexToRgb(p.color);
+          data[pixelIdx] = rgb.r;
+          data[pixelIdx + 1] = rgb.g;
+          data[pixelIdx + 2] = rgb.b;
+          data[pixelIdx + 3] = 255;
         }
+      }
 
-        window.onload = function() {
-            renderElementList();
-            selectElement(0);
-            simGameLoop();
-        };
-    </script>
+      ctx.putImageData(imgData, 0, 0);
+    }
+
+    function hexToRgb(hex) {
+      if (!hex || !hex.startsWith('#')) return { r: 255, g: 255, b: 255 };
+      const bigint = parseInt(hex.slice(1), 16);
+      return {
+        r: (bigint >> 16) & 255,
+        g: (bigint >> 8) & 255,
+        b: bigint & 255
+      };
+    }
+
+    function loadSimPreset(preset) {
+      clearSimCanvas();
+      if (preset === 'box') {
+        // Build glass/stone container
+        for (let x = 20; x < 108; x++) {
+          createParticleAt(x, 100, 'stone');
+        }
+        for (let y = 40; y <= 100; y++) {
+          createParticleAt(20, y, 'stone');
+          createParticleAt(107, y, 'stone');
+        }
+      } else if (preset === 'lava_water') {
+        loadSimPreset('box');
+        for (let y = 70; y < 99; y++) {
+          for (let x = 25; x < 60; x++) createParticleAt(x, y, 'water');
+          for (let x = 65; x < 100; x++) createParticleAt(x, y, 'super_lava');
+        }
+      }
+    }
+
+    function scrollSection(id) {
+      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Initialize application on load
+    window.onload = init;
+  </script>
 </body>
 </html>
