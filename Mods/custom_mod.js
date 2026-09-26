@@ -2,7 +2,7 @@
 
 elements.super_fuel_pellet = {
   color: "#5e0a00",
-  category: "powder",
+  category: "powders",
   behavior: behaviors.POWDER,
   state: "powder",
   density: 1000,
@@ -44,9 +44,9 @@ elements.average_fuel = {
 
 elements.methane_gas = {
   color: "#bbffb7",
-  category: "liquids",
-  behavior: behaviors.LIQUID,
-  state: "liquid",
+  category: "gases",
+  behavior: behaviors.GAS,
+  state: "gas",
   density: 100,
   tempLow: -162,
   stateLow: "lng",
